@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "CacheCat - Full-featured Chrome Extension to view, edit, and manage website storage (Cookies, Local Storage, Session Storage, IndexedDB, Cache Storage). Modern dashboard interface with light/dark themes.",
   "type": "module",
+  "main": "dist/background.js",
   "scripts": {
     "dev": "vite build --watch --mode development",
     "build": "vite build",
     "lint": "eslint . --ext .js,.jsx --ignore-pattern 'dist/**' --ignore-pattern 'node_modules/**'",
-    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\"",
-    "preview": "vite preview"
+    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\""
   },
   "keywords": [
     "chrome-extension",
@@ -31,8 +31,16 @@
     "web-development",
     "debugging-tools"
   ],
-  "author": "",
+  "author": "chinmay29hub",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chinmay29hub/CacheCat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chinmay29hub/CacheCat/issues"
+  },
+  "homepage": "https://github.com/chinmay29hub/CacheCat#readme",
   "devDependencies": {
     "@types/chrome": "^0.0.268",
     "@vitejs/plugin-react": "^4.3.1",
