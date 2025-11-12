@@ -1,26 +1,42 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { copyFileSync, existsSync, mkdirSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 
 export default defineConfig({
   plugins: [
     react(),
-    viteStaticCopy({
-      targets: [
-        { src: 'manifest.json', dest: '.' },
-        { src: 'icons/*.png', dest: 'icons' },
-      ],
-    }),
     {
-      name: 'copy-background-agent',
+      name: 'copy-extension-files',
       closeBundle() {
-        // Copy background and agent to dist root
         const distDir = resolve(__dirname, 'dist');
         if (!existsSync(distDir)) {
           mkdirSync(distDir, { recursive: true });
         }
+
+        // Copy manifest.json
+        const manifestSrc = resolve(__dirname, 'manifest.json');
+        const manifestDest = resolve(distDir, 'manifest.json');
+        if (existsSync(manifestSrc)) {
+          copyFileSync(manifestSrc, manifestDest);
+          console.log('Copied manifest.json to dist');
+        }
+
+        // Copy icons
+        const iconsSrc = resolve(__dirname, 'icons');
+        const iconsDest = resolve(distDir, 'icons');
+        if (existsSync(iconsSrc)) {
+          if (!existsSync(iconsDest)) {
+            mkdirSync(iconsDest, { recursive: true });
+          }
+          const iconFiles = readdirSync(iconsSrc).filter((file) => file.endsWith('.png'));
+          iconFiles.forEach((file) => {
+            copyFileSync(resolve(iconsSrc, file), resolve(iconsDest, file));
+          });
+          console.log(`Copied ${iconFiles.length} icon(s) to dist/icons`);
+        }
+
+        // Copy background and agent scripts
         const bgSrc = resolve(__dirname, 'src/background/background.js');
         const agentSrc = resolve(__dirname, 'src/agent/agent.js');
         const contentSrc = resolve(__dirname, 'src/content/content.js');
