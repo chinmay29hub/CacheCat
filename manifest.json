@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "CacheCat",
+  "version": "1.0.0",
+  "description": "View, edit, and manage website storage (Cookies, Local Storage, Session Storage, IndexedDB, Cache Storage) with a modern dashboard interface. Perfect for developers and power users.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["cookies", "scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Open CacheCat Dashboard",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["agent.js", "content.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

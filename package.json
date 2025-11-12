@@ -1,0 +1,55 @@
+{
+  "name": "cachecat",
+  "version": "1.0.0",
+  "description": "CacheCat - Full-featured Chrome Extension to view, edit, and manage website storage (Cookies, Local Storage, Session Storage, IndexedDB, Cache Storage). Modern dashboard interface with light/dark themes.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "lint": "eslint . --ext .js,.jsx --ignore-pattern 'dist/**' --ignore-pattern 'node_modules/**'",
+    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\"",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "chrome-extension",
+    "storage",
+    "cookies",
+    "localstorage",
+    "indexeddb",
+    "cache-storage",
+    "session-storage",
+    "web-storage",
+    "storage-manager",
+    "storage-inspector",
+    "devtools",
+    "developer-tools",
+    "browser-storage",
+    "storage-editor",
+    "cache-manager",
+    "cookie-manager",
+    "storage-viewer",
+    "web-development",
+    "debugging-tools"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.13",
+    "terser": "^5.44.1",
+    "vite": "^5.4.2",
+    "vite-plugin-static-copy": "^1.0.3"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
