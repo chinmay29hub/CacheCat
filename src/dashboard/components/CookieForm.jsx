@@ -44,11 +44,7 @@ export default function CookieForm({ cookie, onSave, onCancel, defaultUrl }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-        {cookie ? 'Edit Cookie' : 'Add Cookie'}
-      </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -150,6 +146,5 @@ export default function CookieForm({ cookie, onSave, onCancel, defaultUrl }) {
           </button>
         </div>
       </form>
-    </div>
   );
 }

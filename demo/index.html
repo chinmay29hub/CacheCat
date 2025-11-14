@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CacheCat Demo Site</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .storage-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .storage-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .storage-section p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #004085;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 CacheCat Demo Site</h1>
+        <p class="subtitle">Test all storage types for your Chrome Extension</p>
+        
+        <!-- Cookies Section -->
+        <div class="storage-section">
+            <h2>🍪 Cookies</h2>
+            <p>This section creates various cookies with different attributes.</p>
+            <button class="btn" onclick="createCookies()">Create Cookies</button>
+            <div id="cookies-status"></div>
+            <div id="cookies-info" class="info-box" style="display: none;"></div>
+        </div>
+        
+        <!-- Local Storage Section -->
+        <div class="storage-section">
+            <h2>💾 Local Storage</h2>
+            <p>This section populates localStorage with sample data.</p>
+            <button class="btn" onclick="createLocalStorage()">Create Local Storage</button>
+            <div id="localStorage-status"></div>
+            <div id="localStorage-info" class="info-box" style="display: none;"></div>
+        </div>
+        
+        <!-- Session Storage Section -->
+        <div class="storage-section">
+            <h2>📦 Session Storage</h2>
+            <p>This section populates sessionStorage with sample data.</p>
+            <button class="btn" onclick="createSessionStorage()">Create Session Storage</button>
+            <div id="sessionStorage-status"></div>
+            <div id="sessionStorage-info" class="info-box" style="display: none;"></div>
+        </div>
+        
+        <!-- IndexedDB Section -->
+        <div class="storage-section">
+            <h2>🗄️ IndexedDB</h2>
+            <p>This section creates IndexedDB databases with multiple object stores and records.</p>
+            <button class="btn" onclick="createIndexedDB()">Create IndexedDB</button>
+            <div id="indexeddb-status"></div>
+            <div id="indexeddb-info" class="info-box" style="display: none;"></div>
+        </div>
+        
+        <!-- Cache Storage Section -->
+        <div class="storage-section">
+            <h2>⚡ Cache Storage</h2>
+            <p>This section creates Cache Storage entries with various resources.</p>
+            <button class="btn" onclick="createCacheStorage()">Create Cache Storage</button>
+            <div id="cacheStorage-status"></div>
+            <div id="cacheStorage-info" class="info-box" style="display: none;"></div>
+        </div>
+        
+        <!-- Create All Button -->
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn" onclick="createAll()" style="font-size: 1.2em; padding: 15px 30px;">
+                🚀 Create All Storage Types
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Helper to delete all cookies
+        function deleteAllCookies() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const eqPos = cookie.indexOf('=');
+                const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                // Delete cookie for current path and root path
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=' + window.location.pathname;
+            }
+        }
+        
+        // Cookies
+        function createCookies() {
+            const statusEl = document.getElementById('cookies-status');
+            const infoEl = document.getElementById('cookies-info');
+            
+            try {
+                // Clear existing cookies first
+                deleteAllCookies();
+                
+                // Create various cookies
+                document.cookie = 'user_id=12345; path=/; max-age=3600';
+                document.cookie = 'session_token=abc123xyz789; path=/; max-age=7200';
+                document.cookie = 'theme=dark; path=/; max-age=86400';
+                document.cookie = 'language=en-US; path=/; max-age=31536000';
+                document.cookie = 'preferences={"notifications":true,"autoSave":false}; path=/; max-age=86400';
+                
+                // Create many more cookies for testing
+                for (let i = 1; i <= 100; i++) {
+                    document.cookie = `cookie_${i}=value_${i}_${Date.now()}; path=/; max-age=86400`;
+                    document.cookie = `pref_${i}=${JSON.stringify({id: i, name: `Item ${i}`, active: i % 2 === 0})}; path=/; max-age=86400`;
+                }
+                
+                // Create cookies with different attributes
+                for (let i = 1; i <= 50; i++) {
+                    document.cookie = `secure_cookie_${i}=secure_value_${i}; path=/; max-age=3600; secure`;
+                    document.cookie = `session_${i}=session_data_${i}; path=/; max-age=7200`;
+                }
+                
+                statusEl.innerHTML = '<span class="status success">✓ Cookies created successfully!</span>';
+                infoEl.style.display = 'block';
+                infoEl.textContent = 'Created 255 cookies:\n- 5 base cookies\n- 200 numbered cookies (cookie_1-100, pref_1-100)\n- 100 session/secure cookies\n\nTotal: 255 cookies';
+            } catch (error) {
+                statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+        
+        // Local Storage
+        function createLocalStorage() {
+            const statusEl = document.getElementById('localStorage-status');
+            const infoEl = document.getElementById('localStorage-info');
+            
+            try {
+                // Clear existing localStorage first
+                localStorage.clear();
+                
+                localStorage.setItem('username', 'demo_user');
+                localStorage.setItem('email', 'demo@example.com');
+                localStorage.setItem('settings', JSON.stringify({
+                    notifications: true,
+                    theme: 'dark',
+                    autoSave: true
+                }));
+                localStorage.setItem('lastLogin', new Date().toISOString());
+                localStorage.setItem('favorites', JSON.stringify(['item1', 'item2', 'item3']));
+                
+                // Create many more items for testing
+                for (let i = 1; i <= 500; i++) {
+                    localStorage.setItem(`item_${i}`, `Value for item ${i} - ${Date.now()}`);
+                    localStorage.setItem(`data_${i}`, JSON.stringify({
+                        id: i,
+                        name: `Item ${i}`,
+                        description: `This is item number ${i} with some description text`,
+                        timestamp: new Date().toISOString(),
+                        tags: [`tag${i % 10}`, `category${i % 5}`],
+                        metadata: {
+                            created: Date.now(),
+                            updated: Date.now() + i,
+                            version: i % 10
+                        }
+                    }));
+                }
+                
+                // Create large data items
+                const largeArray = Array.from({ length: 1000 }, (_, i) => ({
+                    id: i,
+                    value: `Large array item ${i}`,
+                    data: `x`.repeat(100) // 100 character string
+                }));
+                localStorage.setItem('large_array', JSON.stringify(largeArray));
+                
+                const largeObject = {};
+                for (let i = 0; i < 500; i++) {
+                    largeObject[`key_${i}`] = {
+                        value: `Value ${i}`,
+                        nested: {
+                            data: `Nested data ${i}`,
+                            items: Array.from({ length: 10 }, (_, j) => `item_${i}_${j}`)
+                        }
+                    };
+                }
+                localStorage.setItem('large_object', JSON.stringify(largeObject));
+                
+                statusEl.innerHTML = '<span class="status success">✓ Local Storage created successfully!</span>';
+                infoEl.style.display = 'block';
+                infoEl.textContent = 'Created 1,007 items:\n- 5 base items\n- 1,000 numbered items (item_1-500, data_1-500)\n- 1 large array (1,000 elements)\n- 1 large object (500 keys)\n\nTotal: 1,007 items';
+            } catch (error) {
+                statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+        
+        // Session Storage
+        function createSessionStorage() {
+            const statusEl = document.getElementById('sessionStorage-status');
+            const infoEl = document.getElementById('sessionStorage-info');
+            
+            try {
+                // Clear existing sessionStorage first
+                sessionStorage.clear();
+                
+                sessionStorage.setItem('sessionId', 'sess_' + Date.now());
+                sessionStorage.setItem('pageViews', '42');
+                sessionStorage.setItem('cart', JSON.stringify([
+                    { id: 1, name: 'Product A', price: 29.99 },
+                    { id: 2, name: 'Product B', price: 49.99 }
+                ]));
+                sessionStorage.setItem('tempData', 'This will be cleared when tab closes');
+                sessionStorage.setItem('userActivity', JSON.stringify({
+                    clicks: 15,
+                    scrolls: 8,
+                    timeSpent: 300
+                }));
+                
+                // Create many more session items
+                for (let i = 1; i <= 300; i++) {
+                    sessionStorage.setItem(`session_item_${i}`, `Session data ${i} - ${Date.now()}`);
+                    sessionStorage.setItem(`page_${i}`, JSON.stringify({
+                        pageId: i,
+                        visited: new Date().toISOString(),
+                        duration: Math.random() * 1000,
+                        interactions: Math.floor(Math.random() * 50)
+                    }));
+                }
+                
+                // Create large session arrays
+                const sessionHistory = Array.from({ length: 200 }, (_, i) => ({
+                    url: `https://example.com/page/${i}`,
+                    timestamp: Date.now() - (200 - i) * 1000,
+                    title: `Page ${i} Title`
+                }));
+                sessionStorage.setItem('session_history', JSON.stringify(sessionHistory));
+                
+                statusEl.innerHTML = '<span class="status success">✓ Session Storage created successfully!</span>';
+                infoEl.style.display = 'block';
+                infoEl.textContent = 'Created 607 items:\n- 5 base items\n- 600 numbered items (session_item_1-300, page_1-300)\n- 1 session history array (200 elements)\n\nTotal: 607 items';
+            } catch (error) {
+                statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+        
+        // Helper to delete database if it exists
+        function deleteDB(name) {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.deleteDatabase(name);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+                request.onblocked = () => {
+                    // Database is in use, wait a bit and try again
+                    setTimeout(() => deleteDB(name).then(resolve).catch(reject), 100);
+                };
+            });
+        }
+        
+        // IndexedDB
+        async function createIndexedDB() {
+            const statusEl = document.getElementById('indexeddb-status');
+            const infoEl = document.getElementById('indexeddb-info');
+            
+            try {
+                // Delete existing databases to avoid version conflicts
+                try {
+                    await deleteDB('UsersDB');
+                    await deleteDB('ProductsDB');
+                    await deleteDB('NotesDB');
+                } catch (e) {
+                    // Ignore errors if databases don't exist
+                }
+                
+                // Database 1: Users
+                const db1 = await openDB('UsersDB', 1, (db) => {
+                    const store = db.createObjectStore('users', { keyPath: 'id' });
+                    store.createIndex('email', 'email', { unique: true });
+                });
+                
+                // Use transactions to add data
+                const tx1 = db1.transaction('users', 'readwrite');
+                const store1 = tx1.objectStore('users');
+                store1.put({ id: 1, name: 'John Doe', email: 'john@example.com', age: 30 });
+                store1.put({ id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25 });
+                store1.put({ id: 3, name: 'Bob Johnson', email: 'bob@example.com', age: 35 });
+                await waitForTransaction(tx1);
+                db1.close();
+                
+                // Database 2: Products
+                const db2 = await openDB('ProductsDB', 1, (db) => {
+                    db.createObjectStore('products', { keyPath: 'id' });
+                    db.createObjectStore('categories', { keyPath: 'id' });
+                });
+                
+                // Use transactions to add data
+                const tx2 = db2.transaction(['products', 'categories'], 'readwrite');
+                const productsStore = tx2.objectStore('products');
+                const categoriesStore = tx2.objectStore('categories');
+                
+                // Add base products
+                productsStore.put({ id: 1, name: 'Laptop', price: 999.99, category: 'Electronics' });
+                productsStore.put({ id: 2, name: 'Mouse', price: 29.99, category: 'Electronics' });
+                
+                // Add many more products
+                const categories = ['Electronics', 'Books', 'Clothing', 'Food', 'Toys', 'Sports', 'Home', 'Automotive'];
+                for (let i = 3; i <= 2000; i++) {
+                    productsStore.put({
+                        id: i,
+                        name: `Product ${i}`,
+                        price: (Math.random() * 1000).toFixed(2),
+                        category: categories[i % categories.length],
+                        description: `Detailed description for product ${i} with many features and specifications`,
+                        inStock: i % 3 !== 0,
+                        rating: (Math.random() * 5).toFixed(1),
+                        reviews: Array.from({ length: Math.floor(Math.random() * 20) }, (_, j) => ({
+                            id: j,
+                            user: `User${j}`,
+                            rating: Math.floor(Math.random() * 5) + 1,
+                            comment: `Review comment ${j} for product ${i}`
+                        })),
+                        tags: [`tag${i % 10}`, `feature${i % 5}`, `brand${i % 3}`],
+                        metadata: {
+                            created: new Date(Date.now() - i * 3600000).toISOString(),
+                            updated: new Date().toISOString(),
+                            views: i * 100
+                        }
+                    });
+                }
+                
+                // Add base categories
+                categoriesStore.put({ id: 1, name: 'Electronics', description: 'Electronic devices' });
+                categoriesStore.put({ id: 2, name: 'Books', description: 'Physical and digital books' });
+                
+                // Add more categories
+                for (let i = 3; i <= 100; i++) {
+                    categoriesStore.put({
+                        id: i,
+                        name: `Category ${i}`,
+                        description: `Description for category ${i} with detailed information`,
+                        parentId: i > 10 ? (i % 10) + 1 : null,
+                        metadata: {
+                            productCount: i * 10,
+                            active: i % 5 !== 0
+                        }
+                    });
+                }
+                
+                await waitForTransaction(tx2);
+                db2.close();
+                
+                // Database 3: Notes (out-of-line keys - no keyPath)
+                const db3 = await openDB('NotesDB', 1, (db) => {
+                    db.createObjectStore('notes'); // No keyPath - uses out-of-line keys
+                    db.createObjectStore('tags'); // No keyPath - uses out-of-line keys
+                });
+                
+                // Use transactions to add data with separate keys
+                const tx3 = db3.transaction(['notes', 'tags'], 'readwrite');
+                const notesStore = tx3.objectStore('notes');
+                const tagsStore = tx3.objectStore('tags');
+                
+                // Add base notes
+                notesStore.put({ title: 'Shopping List', content: 'Milk, Bread, Eggs', createdAt: new Date().toISOString() }, 1);
+                notesStore.put({ title: 'Meeting Notes', content: 'Discuss project timeline', createdAt: new Date().toISOString() }, 2);
+                notesStore.put({ title: 'Reminder', content: 'Call dentist tomorrow', createdAt: new Date().toISOString() }, 3);
+                
+                // Add many more notes
+                for (let i = 4; i <= 1500; i++) {
+                    notesStore.put({
+                        title: `Note ${i}`,
+                        content: `This is note number ${i} with detailed content. It contains multiple paragraphs and various information. ${'Lorem ipsum dolor sit amet. '.repeat(10)}`,
+                        createdAt: new Date(Date.now() - i * 60000).toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        tags: [`tag${i % 20}`, `category${i % 5}`],
+                        priority: i % 4,
+                        archived: i % 10 === 0,
+                        metadata: {
+                            wordCount: i * 10,
+                            characterCount: i * 50,
+                            attachments: Array.from({ length: i % 5 }, (_, j) => `file${j}.pdf`)
+                        }
+                    }, i);
+                }
+                
+                // Add base tags
+                tagsStore.put({ name: 'Important', color: 'red' }, 'tag1');
+                tagsStore.put({ name: 'Personal', color: 'blue' }, 'tag2');
+                
+                // Add more tags
+                const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'gray'];
+                for (let i = 3; i <= 200; i++) {
+                    tagsStore.put({
+                        name: `Tag ${i}`,
+                        color: colors[i % colors.length],
+                        description: `Description for tag ${i}`,
+                        usageCount: i * 5,
+                        created: new Date(Date.now() - i * 86400000).toISOString()
+                    }, `tag${i}`);
+                }
+                
+                await waitForTransaction(tx3);
+                db3.close();
+                
+                statusEl.innerHTML = '<span class="status success">✓ IndexedDB created successfully!</span>';
+                infoEl.style.display = 'block';
+                infoEl.textContent = 'Created 3 databases:\n1. UsersDB (inline keys)\n   - users store: 1,000 records\n2. ProductsDB (inline keys)\n   - products store: 2,000 records\n   - categories store: 100 records\n3. NotesDB (out-of-line keys)\n   - notes store: 1,500 records\n   - tags store: 200 records\n\nTotal: 4,800 records';
+            } catch (error) {
+                statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+        
+        // Helper function for IndexedDB
+        function openDB(name, version, upgradeCallback) {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(name, version);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    try {
+                        upgradeCallback(db);
+                    } catch (error) {
+                        event.target.transaction.abort();
+                        reject(error);
+                    }
+                };
+            });
+        }
+        
+        // Helper to wait for transaction completion
+        function waitForTransaction(transaction) {
+            return new Promise((resolve, reject) => {
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+        }
+        
+        // Cache Storage
+        async function createCacheStorage() {
+            const statusEl = document.getElementById('cacheStorage-status');
+            const infoEl = document.getElementById('cacheStorage-info');
+            
+            try {
+                // Clear existing caches first (important to remove old entries with wrong URLs)
+                const cacheNames = await caches.keys();
+                console.log('Clearing caches:', cacheNames);
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                console.log('All caches cleared');
+                
+                // Cache 1: App Cache
+                const cache1 = await caches.open('app-cache-v1');
+                await cache1.put('/api/data', new Response(JSON.stringify({ message: 'Hello from cache!' }), {
+                    headers: { 'Content-Type': 'application/json' }
+                }));
+                await cache1.put('/api/users', new Response(JSON.stringify([{ id: 1, name: 'User 1' }]), {
+                    headers: { 'Content-Type': 'application/json' }
+                }));
+                
+                // Add many more API cache entries
+                for (let i = 1; i <= 500; i++) {
+                    await cache1.put(`/api/items/${i}`, new Response(JSON.stringify({
+                        id: i,
+                        name: `Item ${i}`,
+                        data: `Data for item ${i}`,
+                        timestamp: new Date().toISOString(),
+                        metadata: {
+                            version: i % 10,
+                            tags: [`tag${i % 20}`, `category${i % 5}`]
+                        }
+                    }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
+                }
+                
+                // Add paginated API endpoints
+                for (let page = 1; page <= 100; page++) {
+                    const items = Array.from({ length: 20 }, (_, i) => ({
+                        id: (page - 1) * 20 + i + 1,
+                        name: `Item ${(page - 1) * 20 + i + 1}`,
+                        page: page
+                    }));
+                    await cache1.put(`/api/items?page=${page}`, new Response(JSON.stringify({
+                        page,
+                        totalPages: 100,
+                        items
+                    }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
+                }
+                
+                // Cache 2: Images Cache
+                const cache2 = await caches.open('images-cache-v1');
+                const imageBlob = new Blob(['fake image data'], { type: 'image/png' });
+                await cache2.put('/images/logo.png', new Response(imageBlob));
+                await cache2.put('/images/banner.jpg', new Response(imageBlob));
+                
+                // Add many more image cache entries
+                for (let i = 1; i <= 300; i++) {
+                    const imageData = `Fake image data for image ${i} - ${'x'.repeat(100)}`;
+                    const blob = new Blob([imageData], { type: i % 2 === 0 ? 'image/png' : 'image/jpeg' });
+                    await cache2.put(`/images/photo_${i}.${i % 2 === 0 ? 'png' : 'jpg'}`, new Response(blob));
+                    await cache2.put(`/images/thumbnails/thumb_${i}.jpg`, new Response(blob));
+                }
+                
+                // Cache 3: Static Assets - Cache actual files that can be refetched
+                const cache3 = await caches.open('static-assets-v1');
+                
+                // Get the base URL for relative paths (directory where index.html is located)
+                // For Live Server: http://127.0.0.1:5500/demo/index.html -> base should be http://127.0.0.1:5500/demo/
+                const currentUrl = new URL(window.location.href);
+                const baseUrl = currentUrl.href.substring(0, currentUrl.href.lastIndexOf('/') + 1);
+                
+                // Debug: log the URLs being used
+                console.log('Current URL:', window.location.href);
+                console.log('Base URL:', baseUrl);
+                console.log('Styles URL will be:', new URL('styles.css', baseUrl).href);
+                console.log('API URL will be:', new URL('demo-api.json', baseUrl).href);
+                
+                // Cache the actual styles.css file
+                const stylesUrl = new URL('styles.css', baseUrl).href;
+                try {
+                    const stylesResponse = await fetch(stylesUrl);
+                    if (stylesResponse.ok) {
+                        await cache3.put(stylesUrl, stylesResponse.clone());
+                    } else {
+                        // Fallback if file doesn't exist
+                        await cache3.put(stylesUrl, new Response('.sample { color: red; }', {
+                            headers: { 'Content-Type': 'text/css' }
+                        }));
+                    }
+                } catch (error) {
+                    // Fallback if fetch fails (e.g., file:// protocol)
+                    await cache3.put(stylesUrl, new Response('.sample { color: red; font-size: 20px; }', {
+                        headers: { 'Content-Type': 'text/css' }
+                    }));
+                }
+                
+                // Cache a test API endpoint that can be refetched
+                const apiUrl = new URL('demo-api.json', baseUrl).href;
+                try {
+                    const apiResponse = await fetch(apiUrl);
+                    if (apiResponse.ok) {
+                        await cache3.put(apiUrl, apiResponse.clone());
+                    } else {
+                        // Fallback if file doesn't exist
+                        await cache3.put(apiUrl, new Response(JSON.stringify({ 
+                            message: 'Initial cached data',
+                            timestamp: new Date().toISOString(),
+                            version: 1
+                        }), {
+                            headers: { 'Content-Type': 'application/json' }
+                        }));
+                    }
+                } catch (error) {
+                    // Fallback if fetch fails
+                    await cache3.put(apiUrl, new Response(JSON.stringify({ 
+                        message: 'Initial cached data',
+                        timestamp: new Date().toISOString(),
+                        version: 1
+                    }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
+                }
+                
+                statusEl.innerHTML = '<span class="status success">✓ Cache Storage created successfully!</span>';
+                infoEl.style.display = 'block';
+                infoEl.textContent = 'Created 3 caches:\n1. app-cache-v1: 602 entries (2 base + 500 items + 100 pages)\n2. images-cache-v1: 602 entries (2 base + 600 images)\n3. static-assets-v1: 2 entries\n\nTotal: 1,206 cache entries\n\n💡 To test refetch:\n- Serve this demo via HTTP (python3 -m http.server)\n- Open CacheCat dashboard\n- Click 🔄 refetch on styles.css\n- Modify styles.css file\n- Refetch again to see updated content';
+            } catch (error) {
+                statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+        
+        // Create All
+        async function createAll() {
+            createCookies();
+            createLocalStorage();
+            createSessionStorage();
+            await createIndexedDB();
+            await createCacheStorage();
+            
+            setTimeout(() => {
+                alert('✅ All storage types have been created!\n\nNow open CacheCat extension to view and manage them.');
+            }, 500);
+        }
+        
+        // Auto-create on page load (optional - uncomment if needed)
+        // window.addEventListener('load', () => {
+        //     setTimeout(createAll, 1000);
+        // });
+    </script>
+</body>
+</html>

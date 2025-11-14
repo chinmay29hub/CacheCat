@@ -22,11 +22,13 @@
     'CLEAR_SESSION_STORAGE',
     'GET_INDEXEDDB_DATABASES',
     'GET_INDEXEDDB_STORES',
+    'GET_INDEXEDDB_OBJECT_STORES',
     'GET_INDEXEDDB_RECORDS',
     'SET_INDEXEDDB_RECORD',
     'DELETE_INDEXEDDB_RECORD',
     'CLEAR_INDEXEDDB_STORE',
     'GET_CACHE_STORAGE_CACHES',
+    'GET_CACHE_STORAGE_NAMES',
     'GET_CACHE_STORAGE_ENTRIES',
     'DELETE_CACHE_STORAGE_ENTRY',
     'DELETE_CACHE_STORAGE',
@@ -145,31 +147,53 @@
 
     GET_INDEXEDDB_OBJECT_STORES: async ({ databaseName }) => {
       try {
-        const db = await openDatabase(databaseName);
+        // First, verify database exists
+        const allDatabases = await indexedDB.databases();
+        const dbInfo = allDatabases.find((db) => db.name === databaseName);
+        
+        if (!dbInfo) {
+          return { error: `Database ${databaseName} not found` };
+        }
+        
+        // Open database - use current version automatically (safer than specifying version)
+        const db = await openDatabaseWithVersion(databaseName, undefined);
         const stores = [];
-        if (db.objectStoreNames) {
+        
+        if (db && db.objectStoreNames && db.objectStoreNames.length > 0) {
           for (const storeName of db.objectStoreNames) {
-            const store = db.transaction(storeName, 'readonly').objectStore(storeName);
-            const indexes = [];
-            if (store.indexNames) {
-              for (const indexName of store.indexNames) {
-                const index = store.index(indexName);
-                indexes.push({
-                  name: indexName,
-                  keyPath: index.keyPath,
-                  unique: index.unique,
-                  multiEntry: index.multiEntry,
-                });
+            try {
+              const transaction = db.transaction(storeName, 'readonly');
+              const store = transaction.objectStore(storeName);
+              const indexes = [];
+              
+              if (store && store.indexNames && store.indexNames.length > 0) {
+                for (const indexName of store.indexNames) {
+                  try {
+                    const index = store.index(indexName);
+                    indexes.push({
+                      name: indexName,
+                      keyPath: index.keyPath,
+                      unique: index.unique,
+                      multiEntry: index.multiEntry,
+                    });
+                  } catch (indexError) {
+                    console.warn(`Failed to read index ${indexName}:`, indexError);
+                  }
+                }
               }
+              
+              stores.push({
+                name: storeName,
+                keyPath: store.keyPath || null,
+                autoIncrement: store.autoIncrement || false,
+                indexes,
+              });
+            } catch (storeError) {
+              console.warn(`Failed to read store ${storeName}:`, storeError);
             }
-            stores.push({
-              name: storeName,
-              keyPath: store.keyPath,
-              autoIncrement: store.autoIncrement,
-              indexes,
-            });
           }
         }
+        
         db.close();
         return { success: true, stores };
       } catch (error) {
@@ -179,7 +203,29 @@
 
     GET_INDEXEDDB_RECORDS: async ({ databaseName, storeName, page = 0, pageSize = 50 }) => {
       try {
-        const db = await openDatabase(databaseName);
+        // Get the database version
+        const allDatabases = await indexedDB.databases();
+        const dbInfo = allDatabases.find((db) => db.name === databaseName);
+        
+        if (!dbInfo) {
+          return { error: `Database ${databaseName} not found` };
+        }
+        
+        // Open database - use current version automatically
+        let db;
+        try {
+          db = await openDatabaseWithVersion(databaseName, undefined);
+        } catch (error) {
+          return { error: `Failed to open database "${databaseName}": ${error.message}` };
+        }
+        
+        // Validate that the store exists
+        if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(storeName)) {
+          const availableStores = db ? Array.from(db.objectStoreNames).join(', ') : 'none';
+          db.close();
+          return { error: `Object store "${storeName}" not found in database "${databaseName}". Available stores: ${availableStores}` };
+        }
+        
         const transaction = db.transaction(storeName, 'readonly');
         const store = transaction.objectStore(storeName);
         const records = [];
@@ -226,10 +272,96 @@
 
     SET_INDEXEDDB_RECORD: async ({ databaseName, storeName, key, value }) => {
       try {
-        const db = await openDatabase(databaseName);
+        // First, verify database exists
+        const allDatabases = await indexedDB.databases();
+        const dbInfo = allDatabases.find((db) => db.name === databaseName);
+        
+        if (!dbInfo) {
+          return { error: `Database ${databaseName} not found` };
+        }
+        
+        // Open database - use current version automatically
+        let db;
+        try {
+          db = await openDatabaseWithVersion(databaseName, undefined);
+        } catch (error) {
+          return { error: `Failed to open database "${databaseName}": ${error.message}` };
+        }
+        
+        // Validate that the store exists
+        if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(storeName)) {
+          const availableStores = db ? Array.from(db.objectStoreNames).join(', ') : 'none';
+          db.close();
+          return { error: `Object store "${storeName}" not found in database "${databaseName}". Available stores: ${availableStores}` };
+        }
+        
         const transaction = db.transaction(storeName, 'readwrite');
         const store = transaction.objectStore(storeName);
-        await promisifyRequest(store.put(value, key));
+        
+        // Check if store uses inline keys (keyPath)
+        const keyPath = store.keyPath;
+        
+        if (keyPath) {
+          // Store uses inline keys - key must be part of the value object
+          // Ensure the key is in the value object
+          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            // Get existing value at keyPath to determine type
+            const existingValue = value[keyPath];
+            let finalKey = key;
+            
+            // If value object already has the keyPath, prefer that (for editing scenarios)
+            if (existingValue !== undefined) {
+              // Use the existing value's type, but allow key parameter to override
+              if (key !== undefined && key !== null) {
+                // Key parameter provided - use it but match the type
+                if (typeof existingValue === 'number') {
+                  if (typeof key === 'string') {
+                    const numKey = Number(key);
+                    finalKey = (!isNaN(numKey) && isFinite(numKey)) ? numKey : existingValue;
+                  } else {
+                    finalKey = key;
+                  }
+                } else if (typeof existingValue === 'string') {
+                  finalKey = String(key);
+                } else {
+                  finalKey = key;
+                }
+              } else {
+                // No key parameter - use existing value
+                finalKey = existingValue;
+              }
+            } else {
+              // No existing value, use key parameter and infer type
+              if (typeof key === 'string') {
+                const trimmedKey = key.trim();
+                const numKey = Number(trimmedKey);
+                if (!isNaN(numKey) && isFinite(numKey) && trimmedKey === String(numKey)) {
+                  finalKey = numKey;
+                }
+              }
+            }
+            
+            // Ensure the keyPath field is set
+            value[keyPath] = finalKey;
+          } else {
+            return { error: 'Value must be an object when store uses inline keys' };
+          }
+          // Don't pass key as second parameter
+          await promisifyRequest(store.put(value));
+        } else {
+          // Store uses out-of-line keys - pass key as second parameter
+          // Ensure key type is correct (number if it's a number string)
+          let finalKey = key;
+          if (typeof key === 'string') {
+            const trimmedKey = key.trim();
+            const numKey = Number(trimmedKey);
+            if (!isNaN(numKey) && isFinite(numKey) && trimmedKey === String(numKey)) {
+              finalKey = numKey;
+            }
+          }
+          await promisifyRequest(store.put(value, finalKey));
+        }
+        
         db.close();
         return { success: true };
       } catch (error) {
@@ -239,7 +371,24 @@
 
     DELETE_INDEXEDDB_RECORD: async ({ databaseName, storeName, key }) => {
       try {
-        const db = await openDatabase(databaseName);
+        // Verify database exists
+        const allDatabases = await indexedDB.databases();
+        const dbInfo = allDatabases.find((db) => db.name === databaseName);
+        
+        if (!dbInfo) {
+          return { error: `Database ${databaseName} not found` };
+        }
+        
+        // Open database - use current version automatically
+        const db = await openDatabaseWithVersion(databaseName, undefined);
+        
+        // Validate that the store exists
+        if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(storeName)) {
+          const availableStores = db ? Array.from(db.objectStoreNames).join(', ') : 'none';
+          db.close();
+          return { error: `Object store "${storeName}" not found in database "${databaseName}". Available stores: ${availableStores}` };
+        }
+        
         const transaction = db.transaction(storeName, 'readwrite');
         const store = transaction.objectStore(storeName);
         await promisifyRequest(store.delete(key));
@@ -252,7 +401,24 @@
 
     CLEAR_INDEXEDDB_STORE: async ({ databaseName, storeName }) => {
       try {
-        const db = await openDatabase(databaseName);
+        // Verify database exists
+        const allDatabases = await indexedDB.databases();
+        const dbInfo = allDatabases.find((db) => db.name === databaseName);
+        
+        if (!dbInfo) {
+          return { error: `Database ${databaseName} not found` };
+        }
+        
+        // Open database - use current version automatically
+        const db = await openDatabaseWithVersion(databaseName, undefined);
+        
+        // Validate that the store exists
+        if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(storeName)) {
+          const availableStores = db ? Array.from(db.objectStoreNames).join(', ') : 'none';
+          db.close();
+          return { error: `Object store "${storeName}" not found in database "${databaseName}". Available stores: ${availableStores}` };
+        }
+        
         const transaction = db.transaction(storeName, 'readwrite');
         const store = transaction.objectStore(storeName);
         await promisifyRequest(store.clear());
@@ -357,7 +523,58 @@
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(name);
       request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      request.onerror = () => reject(request.error || new Error('Failed to open database'));
+      request.onupgradeneeded = () => {
+        // Database upgrade needed, but we'll resolve after success
+        // This prevents blocking if version changes
+      };
+      request.onblocked = () => {
+        // Database is blocked, but we'll still try to resolve
+        console.warn('Database open blocked, but continuing...');
+      };
+    });
+  }
+
+  function openDatabaseWithVersion(name, version) {
+    return new Promise((resolve, reject) => {
+      // First, try to open without version to get the current version
+      // This handles cases where the version might have changed
+      const request = version !== undefined && version !== null 
+        ? indexedDB.open(name, version)
+        : indexedDB.open(name);
+      
+      let upgradeCompleted = false;
+      
+      request.onsuccess = () => {
+        const db = request.result;
+        // Ensure database is ready by checking objectStoreNames
+        if (db && db.objectStoreNames) {
+          resolve(db);
+        } else {
+          // If objectStoreNames is not available, wait a bit and retry
+          setTimeout(() => {
+            if (request.result && request.result.objectStoreNames) {
+              resolve(request.result);
+            } else {
+              reject(new Error('Database opened but object stores not available'));
+            }
+          }, 100);
+        }
+      };
+      
+      request.onerror = () => {
+        reject(request.error || new Error('Failed to open database'));
+      };
+      
+      request.onupgradeneeded = (event) => {
+        // Mark that upgrade is happening
+        upgradeCompleted = false;
+        // Don't resolve/reject here - wait for onsuccess
+      };
+      
+      request.onblocked = () => {
+        console.warn('Database open blocked, but continuing...');
+      };
     });
   }
 

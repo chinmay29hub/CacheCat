@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import JSONEditor from './JSONEditor';
+import Modal from './Modal';
 
 export default function StorageTable({ items, onSet, onDelete }) {
   const [editingKey, setEditingKey] = useState(null);
@@ -49,48 +50,60 @@ export default function StorageTable({ items, onSet, onDelete }) {
         </button>
       </div>
 
-      {editingKey && (
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Key {editingKey !== '__NEW__' && '(read-only)'}
-              </label>
-              <input
-                type="text"
-                value={newKey}
-                onChange={(e) => setNewKey(e.target.value)}
-                disabled={editingKey !== '__NEW__'}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Value {isJSON(newValue) && <span className="text-xs text-green-600">(JSON)</span>}
-              </label>
-              <JSONEditor value={newValue} onChange={setNewValue} />
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setEditingKey(null);
-                  setNewKey('');
-                  setNewValue('');
-                }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-medium"
-              >
-                Save
-              </button>
-            </div>
+      <Modal
+        isOpen={!!editingKey}
+        onClose={() => {
+          setEditingKey(null);
+          setNewKey('');
+          setNewValue('');
+        }}
+        title={editingKey === '__NEW__' ? 'Add Item' : 'Edit Item'}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Key {editingKey !== '__NEW__' && '(read-only)'}
+            </label>
+            <input
+              type="text"
+              value={newKey}
+              onChange={(e) => setNewKey(e.target.value)}
+              disabled={editingKey !== '__NEW__'}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Value {isJSON(newValue) && <span className="text-xs text-green-600">(JSON)</span>}
+              {!isJSON(newValue) && newValue.trim() && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(plain string)</span>
+              )}
+            </label>
+            <JSONEditor value={newValue} onChange={setNewValue} />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Enter a JSON object/array or a plain string value
+            </p>
+          </div>
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => {
+                setEditingKey(null);
+                setNewKey('');
+                setNewValue('');
+              }}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-medium"
+            >
+              Save
+            </button>
           </div>
         </div>
-      )}
+      </Modal>
 
       <div className="overflow-x-auto">
         <table className="w-full">

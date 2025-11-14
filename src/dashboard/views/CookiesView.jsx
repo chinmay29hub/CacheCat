@@ -3,6 +3,7 @@ import { useAttach } from '../contexts/AttachContext';
 import CookieTable from '../components/CookieTable';
 import CookieForm from '../components/CookieForm';
 import EmptyState from '../components/EmptyState';
+import Modal from '../components/Modal';
 
 export default function CookiesView() {
   const { attachedTab, isAttached } = useAttach();
@@ -118,7 +119,14 @@ export default function CookiesView() {
         </div>
       </div>
 
-      {showForm && (
+      <Modal
+        isOpen={showForm}
+        onClose={() => {
+          setShowForm(false);
+          setEditingCookie(null);
+        }}
+        title={editingCookie ? 'Edit Cookie' : 'Add Cookie'}
+      >
         <CookieForm
           cookie={editingCookie}
           onSave={handleSave}
@@ -128,7 +136,7 @@ export default function CookiesView() {
           }}
           defaultUrl={attachedTab?.origin}
         />
-      )}
+      </Modal>
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading cookies...</div>

@@ -14,6 +14,8 @@ export default function IndexedDBExplorer({
 
   useEffect(() => {
     if (selectedDb) {
+      // Clear selected store when database changes
+      onSelectStore(null);
       loadStores();
     } else {
       setStores([]);
@@ -33,10 +35,19 @@ export default function IndexedDBExplorer({
       if (response.error) {
         throw new Error(response.error);
       }
-      setStores(response.stores || []);
+      const loadedStores = response.stores || [];
+      setStores(loadedStores);
+      
+      // Validate that the currently selected store exists in the loaded stores
+      // If not, clear the selection (this handles database switches)
+      if (selectedStore && !loadedStores.find((s) => s.name === selectedStore.name)) {
+        onSelectStore(null);
+      }
     } catch (error) {
       console.error('Failed to load stores:', error);
       setStores([]);
+      // Clear selected store on error
+      onSelectStore(null);
     } finally {
       setLoading(false);
     }
@@ -108,8 +119,13 @@ export default function IndexedDBExplorer({
       </div>
 
       <div className="col-span-9">
-        {selectedStore ? (
-          <IndexedDBRecords databaseName={selectedDb} store={selectedStore} onRefresh={onRefresh} />
+        {selectedStore && selectedDb && stores.find((s) => s.name === selectedStore.name) ? (
+          <IndexedDBRecords 
+            key={`${selectedDb}-${selectedStore.name}`}
+            databaseName={selectedDb} 
+            store={selectedStore} 
+            onRefresh={onRefresh} 
+          />
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
             <div className="text-4xl mb-4">🗄️</div>

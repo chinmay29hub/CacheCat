@@ -52,7 +52,9 @@ export default function JSONEditor({ value, onChange }) {
         </div>
       )}
       {jsonError && (
-        <div className="text-xs text-red-600 dark:text-red-400">JSON Error: {jsonError}</div>
+        <div className="text-xs text-amber-600 dark:text-amber-400">
+          Not valid JSON (plain strings are also allowed)
+        </div>
       )}
     </div>
   );

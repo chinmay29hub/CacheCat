@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import JSONEditor from './JSONEditor';
+import Modal from './Modal';
 
 export default function IndexedDBRecords({ databaseName, store }) {
   const [records, setRecords] = useState([]);
@@ -11,17 +12,77 @@ export default function IndexedDBRecords({ databaseName, store }) {
   const [newKey, setNewKey] = useState('');
   const [newValue, setNewValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState(null);
+  
+  // Track current database/store combination to prevent race conditions
+  const currentLoadRef = useRef({ databaseName: null, storeName: null, page: null });
 
   const pageSize = 50;
 
   useEffect(() => {
+    // Reset page when database or store changes
+    setPage(0);
+    setError(null);
+    setRecords([]);
+    setTotal(0);
+    setHasMore(false);
+    // Cancel any pending loads by updating the ref
+    currentLoadRef.current = { databaseName: null, storeName: null, page: null };
+  }, [databaseName, store?.name]);
+
+  useEffect(() => {
+    setError(null); // Clear error when store changes
     loadRecords();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [databaseName, store.name, page]);
+  }, [databaseName, store?.name, page]);
 
   const loadRecords = async () => {
+    if (!databaseName || !store?.name) {
+      setError(null);
+      setRecords([]);
+      setTotal(0);
+      setHasMore(false);
+      return;
+    }
+    
+    // Track this load request
+    const loadId = { databaseName, storeName: store.name, page };
+    currentLoadRef.current = loadId;
+    
     setLoading(true);
+    setError(null); // Clear error when starting a new load
+    
     try {
+      // First, verify the store exists in the database before attempting to load
+      const storesResponse = await sendMessageToAgent({
+        type: 'GET_INDEXEDDB_OBJECT_STORES',
+        payload: { databaseName },
+      });
+      
+      // Check if this is still the current load (prevent race conditions)
+      if (
+        currentLoadRef.current.databaseName !== loadId.databaseName ||
+        currentLoadRef.current.storeName !== loadId.storeName ||
+        currentLoadRef.current.page !== loadId.page
+      ) {
+        // This check is for an old request, ignore it
+        return;
+      }
+      
+      if (storesResponse.error) {
+        throw new Error(storesResponse.error);
+      }
+      
+      const availableStores = storesResponse.stores || [];
+      const storeExists = availableStores.find((s) => s.name === store.name);
+      
+      if (!storeExists) {
+        // Store doesn't exist - this shouldn't happen if validation is correct, but handle it gracefully
+        const storeNames = availableStores.map((s) => s.name).join(', ');
+        throw new Error(`Object store "${store.name}" not found in database "${databaseName}". Available stores: ${storeNames || 'none'}`);
+      }
+      
+      // Store exists, proceed with loading records
       const response = await sendMessageToAgent({
         type: 'GET_INDEXEDDB_RECORDS',
         payload: {
@@ -31,17 +92,64 @@ export default function IndexedDBRecords({ databaseName, store }) {
           pageSize,
         },
       });
+      
+      // Check if this is still the current load (prevent race conditions)
+      if (
+        currentLoadRef.current.databaseName !== loadId.databaseName ||
+        currentLoadRef.current.storeName !== loadId.storeName ||
+        currentLoadRef.current.page !== loadId.page
+      ) {
+        // This response is for an old request, ignore it
+        return;
+      }
+      
       if (response.error) {
         throw new Error(response.error);
       }
       setRecords(response.records || []);
       setTotal(response.total || 0);
       setHasMore(response.hasMore || false);
+      setError(null); // Clear any previous errors
     } catch (error) {
+      // Check if this is still the current load before doing anything
+      const isCurrentLoad = 
+        currentLoadRef.current.databaseName === loadId.databaseName &&
+        currentLoadRef.current.storeName === loadId.storeName &&
+        currentLoadRef.current.page === loadId.page;
+      
+      if (!isCurrentLoad) {
+        // This error is for an old request, silently ignore it (don't log or show error)
+        return;
+      }
+      
+      // Only handle errors for the current load
+      // Suppress "not found" errors - these are likely race conditions from rapid database switching
+      const isNotFoundError = error.message && error.message.includes('not found');
+      if (isNotFoundError) {
+        // Silently handle - component will be unmounted/remounted with correct props
+        setRecords([]);
+        setTotal(0);
+        setHasMore(false);
+        setError(null);
+        setLoading(false);
+        return;
+      }
+      
+      // Only log non-race-condition errors
       console.error('Failed to load records:', error);
       setRecords([]);
+      setTotal(0);
+      setHasMore(false);
+      setError(`Failed to load records: ${error.message}`);
     } finally {
-      setLoading(false);
+      // Only update loading state if this is still the current load
+      if (
+        currentLoadRef.current.databaseName === loadId.databaseName &&
+        currentLoadRef.current.storeName === loadId.storeName &&
+        currentLoadRef.current.page === loadId.page
+      ) {
+        setLoading(false);
+      }
     }
   };
 
@@ -53,7 +161,8 @@ export default function IndexedDBRecords({ databaseName, store }) {
 
   const handleEdit = (record) => {
     setEditingRecord(record);
-    setNewKey(record.key);
+    // Convert key to string for the input field
+    setNewKey(String(record.key));
     setNewValue(JSON.stringify(record.value, null, 2));
   };
 
@@ -66,12 +175,62 @@ export default function IndexedDBRecords({ databaseName, store }) {
         parsedValue = newValue;
       }
 
+      // For stores with inline keys (keyPath), use the key from the value object
+      // For stores without inline keys, use the key from the form field
+      let parsedKey = newKey;
+      
+      if (store.keyPath) {
+        // Store uses inline keys - extract key from value object
+        if (typeof parsedValue === 'object' && parsedValue !== null && !Array.isArray(parsedValue)) {
+          parsedKey = parsedValue[store.keyPath];
+          if (parsedKey === undefined) {
+            // If keyPath doesn't exist in value, fall back to form field key
+            const keyStr = String(newKey || '').trim();
+            if (keyStr !== '') {
+              const numKey = Number(keyStr);
+              parsedKey = (!isNaN(numKey) && isFinite(numKey) && keyStr === String(numKey)) ? numKey : keyStr;
+            }
+          }
+        }
+      } else {
+        // Store uses out-of-line keys - parse key from form field
+        const keyStr = String(newKey || '').trim();
+        if (keyStr !== '') {
+          const numKey = Number(keyStr);
+          parsedKey = (!isNaN(numKey) && isFinite(numKey) && keyStr === String(numKey)) ? numKey : keyStr;
+        }
+      }
+
+      // If editing and key changed, we need to delete the old record first
+      // This applies to both inline keys (keyPath) and out-of-line keys
+      if (editingRecord !== '__NEW__' && editingRecord) {
+        const oldKey = editingRecord.key;
+        // Compare keys (handle type differences)
+        const oldKeyStr = String(oldKey);
+        const newKeyStr = String(parsedKey);
+        if (oldKeyStr !== newKeyStr && oldKey !== parsedKey) {
+          // Key changed - delete old record first
+          try {
+            await sendMessageToAgent({
+              type: 'DELETE_INDEXEDDB_RECORD',
+              payload: {
+                databaseName,
+                storeName: store.name,
+                key: oldKey,
+              },
+            });
+          } catch (error) {
+            console.warn('Failed to delete old record:', error);
+          }
+        }
+      }
+
       const response = await sendMessageToAgent({
         type: 'SET_INDEXEDDB_RECORD',
         payload: {
           databaseName,
           storeName: store.name,
-          key: newKey,
+          key: parsedKey,
           value: parsedValue,
         },
       });
@@ -176,6 +335,31 @@ export default function IndexedDBRecords({ databaseName, store }) {
           </div>
         </div>
 
+        {error && (
+          <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+            <div className="flex items-start gap-3">
+              <span className="text-amber-600 dark:text-amber-400 text-xl">⚠️</span>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">
+                  Store Not Found
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                  {error}
+                </p>
+                <button
+                  onClick={() => {
+                    setError(null);
+                    loadRecords();
+                  }}
+                  className="mt-2 text-sm text-amber-700 dark:text-amber-400 hover:underline font-medium"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <input
           type="text"
           placeholder="Search records..."
@@ -185,51 +369,68 @@ export default function IndexedDBRecords({ databaseName, store }) {
         />
       </div>
 
-      {editingRecord && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            {editingRecord === '__NEW__' ? 'Add Record' : 'Edit Record'}
-          </h4>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Key {editingRecord !== '__NEW__' && '(read-only)'}
-              </label>
-              <input
-                type="text"
-                value={newKey}
-                onChange={(e) => setNewKey(e.target.value)}
-                disabled={editingRecord !== '__NEW__'}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Value (JSON)
-              </label>
-              <JSONEditor value={newValue} onChange={setNewValue} />
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setEditingRecord(null);
-                  setNewKey('');
-                  setNewValue('');
-                }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-medium"
-              >
-                Save
-              </button>
-            </div>
+      <Modal
+        isOpen={!!editingRecord}
+        onClose={() => {
+          setEditingRecord(null);
+          setNewKey('');
+          setNewValue('');
+        }}
+        title={editingRecord === '__NEW__' ? 'Add Record' : 'Edit Record'}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {store.keyPath 
+                ? `Key (${store.keyPath} field)` 
+                : 'Key'}
+              {editingRecord !== '__NEW__' && store.keyPath && ' (read-only)'}
+              {store.keyPath && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                  (inline key - will set {store.keyPath} in value object)
+                </span>
+              )}
+              {!store.keyPath && editingRecord !== '__NEW__' && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                  (editable - changing key will create new record)
+                </span>
+              )}
+            </label>
+            <input
+              type="text"
+              value={newKey}
+              onChange={(e) => setNewKey(e.target.value)}
+              disabled={editingRecord !== '__NEW__' && store.keyPath}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+              placeholder={store.keyPath ? `Enter ${store.keyPath} value` : 'Enter key'}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Value (JSON)
+            </label>
+            <JSONEditor value={newValue} onChange={setNewValue} />
+          </div>
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => {
+                setEditingRecord(null);
+                setNewKey('');
+                setNewValue('');
+              }}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-medium"
+            >
+              Save
+            </button>
           </div>
         </div>
-      )}
+      </Modal>
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading records...</div>

@@ -1,0 +1,12 @@
+{
+  "message": "This is a test API endpoint for Cache Storage refetch",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": 1,
+  "data": {
+    "users": [
+      { "id": 1, "name": "John Doe" },
+      { "id": 2, "name": "Jane Smith" }
+    ]
+  }
+}
+
