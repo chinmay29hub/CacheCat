@@ -25,6 +25,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
+  "privacy_policy": "https://chinmay29hub.github.io/CacheCat/privacy-policy.html",
   "web_accessible_resources": [
     {
       "resources": ["agent.js", "content.js"],
