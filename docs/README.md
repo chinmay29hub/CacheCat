@@ -11,6 +11,7 @@ This directory contains the files for GitHub Pages hosting.
 ## URLs
 
 After enabling GitHub Pages, your site will be available at:
+
 - **Landing Page**: `https://chinmay29hub.github.io/CacheCat/`
 - **Demo Site**: `https://chinmay29hub.github.io/CacheCat/demo/`
 - **Privacy Policy**: `https://chinmay29hub.github.io/CacheCat/privacy-policy.html`
@@ -41,9 +42,9 @@ GitHub Pages will automatically deploy from the `docs/` directory.
 ## Chrome Web Store
 
 The `manifest.json` includes the privacy policy URL:
+
 ```json
 "privacy_policy": "https://chinmay29hub.github.io/CacheCat/privacy-policy.html"
 ```
 
 This is all you need for Chrome Web Store submission! ✅
-
