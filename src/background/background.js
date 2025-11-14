@@ -48,7 +48,7 @@ chrome.action.onClicked.addListener(async () => {
   const dashboardTab = await chrome.tabs.create({
     url: chrome.runtime.getURL('dashboard.html'),
   });
-  
+
   // Map this dashboard to the target tab (if we attached to one)
   if (targetTabId) {
     DASHBOARD_TO_TAB.set(dashboardTab.id, targetTabId);
@@ -62,7 +62,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ error: 'Invalid message format' });
     return false;
   }
-  
+
   const { type, payload } = message;
 
   switch (type) {
@@ -142,7 +142,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ error: 'Invalid sender' });
         return false;
       }
-      
+
       // Get cookies for the tab associated with this dashboard
       const dashboardTabIdForCookies = sender.tab?.id;
       let targetTabIdForCookies = null;
@@ -173,7 +173,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ error: 'Invalid sender' });
         return false;
       }
-      
+
       // Set cookie for the tab associated with this dashboard
       const dashboardTabIdForSetCookie = sender.tab?.id;
       let targetTabIdForSetCookie = null;
@@ -204,7 +204,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ error: 'Invalid sender' });
         return false;
       }
-      
+
       // Remove cookie for the tab associated with this dashboard
       const dashboardTabIdForRemoveCookie = sender.tab?.id;
       let targetTabIdForRemoveCookie = null;

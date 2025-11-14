@@ -56,6 +56,7 @@ All permissions are necessary for the extension to function:
 ## Reporting Security Issues
 
 If you discover a security vulnerability, please open an issue on GitHub:
+
 - GitHub: https://github.com/chinmay29hub/CacheCat
 
 ## Overall Security Rating

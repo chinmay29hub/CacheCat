@@ -20,17 +20,20 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 ### Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd CacheCat
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Build the extension**:
+
    ```bash
    npm run build
    ```
@@ -56,23 +59,27 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 ## 📋 What You Can Do
 
 ### Cookies
+
 - View all cookies with full details (name, value, domain, path, expiry, flags)
 - Add, edit, and delete cookies
 - Mask/unmask sensitive values
 - HttpOnly cookies visible and editable
 
 ### Local Storage
+
 - Key/value table with inline editing
 - JSON pretty-view and validation
 - Import/Export JSON
 - Clear all with confirmation
 
 ### Session Storage
+
 - Same features as Local Storage
 - Explicitly tied to the attached tab
 - Labeled "This tab only"
 
 ### IndexedDB
+
 - Database → Object Store → Index hierarchy
 - Paginated record listing
 - Search by key or JSON path
@@ -81,6 +88,7 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 - Clear store with confirmation
 
 ### Cache Storage
+
 - List all caches
 - View entries with request/response details
 - Preview response headers and body
@@ -93,6 +101,7 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 ### Recommended Workflow
 
 1. **Start watch mode** (rebuilds on file changes):
+
    ```bash
    npm run dev
    ```
@@ -117,16 +126,19 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 ### Development Tips
 
 **Fast Iteration:**
+
 - Keep `npm run dev` running in a terminal
 - Keep `chrome://extensions/` tab open for quick reloads
 - Use browser DevTools for debugging
 
 **Debugging:**
+
 - **Dashboard**: Right-click dashboard tab → "Inspect" (React DevTools recommended)
 - **Background**: `chrome://extensions/` → Find CacheCat → Click "service worker" link
 - **Agent/Content**: Open DevTools on the target website → Check Console
 
 **Code Quality:**
+
 ```bash
 # Check for errors
 npm run lint
@@ -186,6 +198,7 @@ CacheCat requires the following permissions to function:
 - ✅ All operations happen locally in your browser
 
 **Why these permissions?**
+
 - Storage access is only used when you explicitly click the extension icon on a website
 - All operations are performed locally - nothing leaves your computer
 - Perfect for developers debugging their own applications

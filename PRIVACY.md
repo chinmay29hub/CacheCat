@@ -27,11 +27,13 @@ CacheCat accesses website storage data (Cookies, Local Storage, Session Storage,
 ### Permissions Explained
 
 **`host_permissions: ["<all_urls>"]`**
+
 - **Why needed**: To access storage on websites you want to inspect
 - **When used**: Only when you click the extension icon on a specific website
 - **Scope**: Limited to storage operations only
 
 **`permissions: ["cookies", "scripting", "activeTab"]`**
+
 - **cookies**: Read and modify cookies (required for cookie management)
 - **scripting**: Inject scripts to access storage APIs (required for Local Storage, IndexedDB, etc.)
 - **activeTab**: Access the currently active tab (required to attach to websites)
@@ -39,6 +41,7 @@ CacheCat accesses website storage data (Cookies, Local Storage, Session Storage,
 ### Local-Only Operation
 
 All operations happen entirely on your device:
+
 - Storage data is read from your browser
 - Modifications are made locally
 - No network requests are made
@@ -47,6 +50,7 @@ All operations happen entirely on your device:
 ### Open Source
 
 CacheCat is open source. You can review the code to verify our privacy claims:
+
 - GitHub: https://github.com/chinmay29hub/CacheCat
 
 ### Contact

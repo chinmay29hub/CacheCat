@@ -13,7 +13,7 @@ export default function IndexedDBRecords({ databaseName, store }) {
   const [newValue, setNewValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
-  
+
   // Track current database/store combination to prevent race conditions
   const currentLoadRef = useRef({ databaseName: null, storeName: null, page: null });
 
@@ -44,21 +44,21 @@ export default function IndexedDBRecords({ databaseName, store }) {
       setHasMore(false);
       return;
     }
-    
+
     // Track this load request
     const loadId = { databaseName, storeName: store.name, page };
     currentLoadRef.current = loadId;
-    
+
     setLoading(true);
     setError(null); // Clear error when starting a new load
-    
+
     try {
       // First, verify the store exists in the database before attempting to load
       const storesResponse = await sendMessageToAgent({
         type: 'GET_INDEXEDDB_OBJECT_STORES',
         payload: { databaseName },
       });
-      
+
       // Check if this is still the current load (prevent race conditions)
       if (
         currentLoadRef.current.databaseName !== loadId.databaseName ||
@@ -68,20 +68,22 @@ export default function IndexedDBRecords({ databaseName, store }) {
         // This check is for an old request, ignore it
         return;
       }
-      
+
       if (storesResponse.error) {
         throw new Error(storesResponse.error);
       }
-      
+
       const availableStores = storesResponse.stores || [];
       const storeExists = availableStores.find((s) => s.name === store.name);
-      
+
       if (!storeExists) {
         // Store doesn't exist - this shouldn't happen if validation is correct, but handle it gracefully
         const storeNames = availableStores.map((s) => s.name).join(', ');
-        throw new Error(`Object store "${store.name}" not found in database "${databaseName}". Available stores: ${storeNames || 'none'}`);
+        throw new Error(
+          `Object store "${store.name}" not found in database "${databaseName}". Available stores: ${storeNames || 'none'}`
+        );
       }
-      
+
       // Store exists, proceed with loading records
       const response = await sendMessageToAgent({
         type: 'GET_INDEXEDDB_RECORDS',
@@ -92,7 +94,7 @@ export default function IndexedDBRecords({ databaseName, store }) {
           pageSize,
         },
       });
-      
+
       // Check if this is still the current load (prevent race conditions)
       if (
         currentLoadRef.current.databaseName !== loadId.databaseName ||
@@ -102,7 +104,7 @@ export default function IndexedDBRecords({ databaseName, store }) {
         // This response is for an old request, ignore it
         return;
       }
-      
+
       if (response.error) {
         throw new Error(response.error);
       }
@@ -112,16 +114,16 @@ export default function IndexedDBRecords({ databaseName, store }) {
       setError(null); // Clear any previous errors
     } catch (error) {
       // Check if this is still the current load before doing anything
-      const isCurrentLoad = 
+      const isCurrentLoad =
         currentLoadRef.current.databaseName === loadId.databaseName &&
         currentLoadRef.current.storeName === loadId.storeName &&
         currentLoadRef.current.page === loadId.page;
-      
+
       if (!isCurrentLoad) {
         // This error is for an old request, silently ignore it (don't log or show error)
         return;
       }
-      
+
       // Only handle errors for the current load
       // Suppress "not found" errors - these are likely race conditions from rapid database switching
       const isNotFoundError = error.message && error.message.includes('not found');
@@ -134,7 +136,7 @@ export default function IndexedDBRecords({ databaseName, store }) {
         setLoading(false);
         return;
       }
-      
+
       // Only log non-race-condition errors
       console.error('Failed to load records:', error);
       setRecords([]);
@@ -178,17 +180,22 @@ export default function IndexedDBRecords({ databaseName, store }) {
       // For stores with inline keys (keyPath), use the key from the value object
       // For stores without inline keys, use the key from the form field
       let parsedKey = newKey;
-      
+
       if (store.keyPath) {
         // Store uses inline keys - extract key from value object
-        if (typeof parsedValue === 'object' && parsedValue !== null && !Array.isArray(parsedValue)) {
+        if (
+          typeof parsedValue === 'object' &&
+          parsedValue !== null &&
+          !Array.isArray(parsedValue)
+        ) {
           parsedKey = parsedValue[store.keyPath];
           if (parsedKey === undefined) {
             // If keyPath doesn't exist in value, fall back to form field key
             const keyStr = String(newKey || '').trim();
             if (keyStr !== '') {
               const numKey = Number(keyStr);
-              parsedKey = (!isNaN(numKey) && isFinite(numKey) && keyStr === String(numKey)) ? numKey : keyStr;
+              parsedKey =
+                !isNaN(numKey) && isFinite(numKey) && keyStr === String(numKey) ? numKey : keyStr;
             }
           }
         }
@@ -197,7 +204,8 @@ export default function IndexedDBRecords({ databaseName, store }) {
         const keyStr = String(newKey || '').trim();
         if (keyStr !== '') {
           const numKey = Number(keyStr);
-          parsedKey = (!isNaN(numKey) && isFinite(numKey) && keyStr === String(numKey)) ? numKey : keyStr;
+          parsedKey =
+            !isNaN(numKey) && isFinite(numKey) && keyStr === String(numKey) ? numKey : keyStr;
         }
       }
 
@@ -343,9 +351,7 @@ export default function IndexedDBRecords({ databaseName, store }) {
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">
                   Store Not Found
                 </p>
-                <p className="text-sm text-amber-700 dark:text-amber-400">
-                  {error}
-                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-400">{error}</p>
                 <button
                   onClick={() => {
                     setError(null);
@@ -381,9 +387,7 @@ export default function IndexedDBRecords({ databaseName, store }) {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {store.keyPath 
-                ? `Key (${store.keyPath} field)` 
-                : 'Key'}
+              {store.keyPath ? `Key (${store.keyPath} field)` : 'Key'}
               {editingRecord !== '__NEW__' && store.keyPath && ' (read-only)'}
               {store.keyPath && (
                 <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">

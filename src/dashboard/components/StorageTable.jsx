@@ -76,7 +76,9 @@ export default function StorageTable({ items, onSet, onDelete }) {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Value {isJSON(newValue) && <span className="text-xs text-green-600">(JSON)</span>}
               {!isJSON(newValue) && newValue.trim() && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(plain string)</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                  (plain string)
+                </span>
               )}
             </label>
             <JSONEditor value={newValue} onChange={setNewValue} />

@@ -37,7 +37,7 @@ export default function IndexedDBExplorer({
       }
       const loadedStores = response.stores || [];
       setStores(loadedStores);
-      
+
       // Validate that the currently selected store exists in the loaded stores
       // If not, clear the selection (this handles database switches)
       if (selectedStore && !loadedStores.find((s) => s.name === selectedStore.name)) {
@@ -120,11 +120,11 @@ export default function IndexedDBExplorer({
 
       <div className="col-span-9">
         {selectedStore && selectedDb && stores.find((s) => s.name === selectedStore.name) ? (
-          <IndexedDBRecords 
+          <IndexedDBRecords
             key={`${selectedDb}-${selectedStore.name}`}
-            databaseName={selectedDb} 
-            store={selectedStore} 
-            onRefresh={onRefresh} 
+            databaseName={selectedDb}
+            store={selectedStore}
+            onRefresh={onRefresh}
           />
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">

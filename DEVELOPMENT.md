@@ -23,9 +23,11 @@ npm run build
 ### 1. Start Watch Mode
 
 **Terminal 1 - Watch Mode:**
+
 ```bash
 npm run dev
 ```
+
 This watches for file changes and automatically rebuilds.
 
 ### 2. Load Extension in Chrome
@@ -46,11 +48,13 @@ This watches for file changes and automatically rebuilds.
 ## Reloading Strategy
 
 **After code changes:**
+
 - **Dashboard changes**: Reload extension → Reload dashboard tab
 - **Background script changes**: Reload extension → Background service worker auto-restarts
 - **Agent/Content script changes**: Reload extension → Reload target website tab
 
 **Quick reload shortcut:**
+
 - In `chrome://extensions/`, focus the extension card and press `R` (or click reload icon)
 
 ## Debugging
@@ -63,6 +67,7 @@ This watches for file changes and automatically rebuilds.
 4. Console shows React errors and logs
 
 **React DevTools:**
+
 - Install [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) extension
 - Inspect component tree, props, state, and hooks
 
@@ -75,6 +80,7 @@ This watches for file changes and automatically rebuilds.
 5. **Note**: Service worker may sleep - click "service worker" again to wake it
 
 **Common Issues:**
+
 - Service worker stopped: Click "service worker" link to restart
 - Changes not reflecting: Reload extension after rebuild
 
@@ -86,9 +92,10 @@ This watches for file changes and automatically rebuilds.
 4. Look for `__CACHECAT_AGENT__` in page context
 
 **Testing Agent:**
+
 ```javascript
 // In website console
-window.__CACHECAT_AGENT__ // Should exist if agent is injected
+window.__CACHECAT_AGENT__; // Should exist if agent is injected
 ```
 
 ### Content Script (Bridge)
@@ -143,12 +150,14 @@ src/
 ## Development vs Production Builds
 
 **Development (`npm run dev`):**
+
 - Watch mode enabled
 - Auto-rebuilds on file changes
 - Console logs preserved
 - Source maps available
 
 **Production (`npm run build`):**
+
 - Single build
 - Minified with Terser
 - Optimized for size
@@ -157,6 +166,7 @@ src/
 ## Testing Checklist
 
 After making changes, test:
+
 - [ ] Extension loads without errors
 - [ ] Dashboard opens when clicking extension icon
 - [ ] Can attach to a website
@@ -234,11 +244,13 @@ npm run format
 ## Performance Tips
 
 **Fast rebuilds:**
+
 - Only edit files in `src/` (not `dist/`)
 - Use watch mode (`npm run dev`) instead of manual builds
 - Keep Chrome extension tab open for quick reloads
 
 **Debugging performance:**
+
 - Use Chrome DevTools Performance tab
 - Check React DevTools Profiler for component renders
 - Monitor network tab for message passing
@@ -262,6 +274,7 @@ npm run format
 ### Dashboard-to-Tab Mapping
 
 Each dashboard is mapped to a specific website tab:
+
 - When extension icon is clicked, dashboard tab ID is mapped to website tab ID
 - All storage operations are routed to the correct tab
 - Multiple dashboards can view different websites simultaneously

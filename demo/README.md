@@ -7,13 +7,16 @@ This demo site helps you test all storage types supported by the CacheCat Chrome
 1. **Open the demo site:**
    - ⚠️ **Important**: For Cache Storage refetch to work, you MUST serve via HTTP (not file://)
    - Serve it with a local server:
+
      ```bash
      # Using Python 3 (from project root)
      cd demo
      python3 -m http.server 8000
      # Then visit http://localhost:8000/
      ```
+
    - Or from project root:
+
      ```bash
      python3 -m http.server 8000
      # Then visit http://localhost:8000/demo/
@@ -41,13 +44,14 @@ This demo site helps you test all storage types supported by the CacheCat Chrome
 To properly test the **Refetch** functionality in Cache Storage:
 
 1. **Serve the demo via HTTP** (required for fetch to work):
+
    ```bash
    cd demo
    python3 -m http.server 8000
    ```
 
 2. **Create cache storage**:
-   - Open http://localhost:8000/
+   - Open <http://localhost:8000/>
    - Click "Create Cache Storage"
 
 3. **Test refetch**:
@@ -70,4 +74,3 @@ To properly test the **Refetch** functionality in Cache Storage:
 - "Create All" button for quick setup
 - Status indicators showing success/error states
 - Info boxes displaying what was created
-
