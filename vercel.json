@@ -12,7 +12,7 @@
           "value": "www.cachecat.vercel.app"
         }
       ],
-      "destination": "https://cachecat.vercel.app/:path*",
+      "destination": "https://cachecat.vercel.app$1",
       "permanent": true
     }
   ],
