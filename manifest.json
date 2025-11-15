@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CacheCat",
   "version": "1.0.0",
-  "description": "View, edit, and manage website storage (Cookies, Local Storage, Session Storage, IndexedDB, Cache Storage) with a modern dashboard interface. Perfect for developers and power users.",
+  "description": "View, edit, and manage website storage. Supports Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

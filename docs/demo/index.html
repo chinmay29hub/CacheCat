@@ -409,6 +409,97 @@
             padding: clamp(0.875rem, 2.5vw, 1rem) clamp(1.5rem, 4vw, 2rem);
         }
         
+        /* Visual Guide Styles */
+        .guide-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            animation: slideDown 0.5s ease-out;
+            position: relative;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .guide-banner h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .guide-banner .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .guide-banner .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .guide-banner .step-number {
+            background: white;
+            color: #667eea;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .guide-banner .step-content {
+            flex: 1;
+        }
+        
+        .guide-banner .step-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .guide-banner .extension-icon {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-weight: bold;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .guide-banner {
+                padding: 1rem;
+            }
+            
+            .guide-banner .step {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -785,6 +876,33 @@
         <h1>🐱 CacheCat Demo Site</h1>
         <p class="subtitle">Test all storage types for your Chrome Extension</p>
         
+        <!-- Visual Guide Banner -->
+        <div id="guide-banner" class="guide-banner">
+            <div id="guide-content">
+                <h3>🎯 Getting Started</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <strong>Create Dummy Data</strong>
+                            <p>Click the buttons below to create sample storage data (Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage).</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <strong>Open CacheCat Extension</strong>
+                            <p>After creating the data, click the CacheCat extension icon in your browser toolbar to open the dashboard and view all the storage data.</p>
+                            <div class="extension-icon">
+                                <img src="../icons/icon48.png" alt="CacheCat icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
+                                Click the CacheCat icon in your browser toolbar
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Cookies Section -->
         <div class="storage-section">
             <h2>🍪 Cookies</h2>
@@ -856,7 +974,7 @@
         </div>
       </nav>
       <div class="footer-bottom">
-        <p>&copy; 2024 CacheCat. Open Source Chrome Extension. <a href="https://github.com/chinmay29hub/CacheCat/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
+        <p>&copy; 2025 CacheCat. Open Source Chrome Extension. <a href="https://github.com/chinmay29hub/CacheCat/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
       </div>
     </div>
   </footer>
