@@ -3,6 +3,19 @@
   "outputDirectory": "docs",
   "installCommand": null,
   "framework": null,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.cachecat.vercel.app"
+        }
+      ],
+      "destination": "https://cachecat.vercel.app/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
