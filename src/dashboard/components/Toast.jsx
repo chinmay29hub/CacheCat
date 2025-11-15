@@ -19,7 +19,7 @@ export default function Toast({ toast, onClose }) {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-in">
+    <div className="fixed top-20 right-4 z-50 animate-slide-in">
       <div
         className={`${styles[toast.type]} border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3 min-w-[300px]`}
       >
