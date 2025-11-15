@@ -5,14 +5,14 @@
   "framework": null,
   "redirects": [
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "has": [
         {
           "type": "host",
           "value": "www.cachecat.vercel.app"
         }
       ],
-      "destination": "https://cachecat.vercel.app$1",
+      "destination": "https://cachecat.vercel.app/:path*",
       "permanent": true
     }
   ],
