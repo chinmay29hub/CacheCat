@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite build --watch --mode development",
     "build": "vite build",
+    "build:store": "npm run build && bash scripts/create-store-zip.sh",
     "lint": "eslint . --ext .js,.jsx --ignore-pattern 'dist/**' --ignore-pattern 'node_modules/**'",
     "format": "prettier --write \"**/*.{js,jsx,json,css,md}\""
   },

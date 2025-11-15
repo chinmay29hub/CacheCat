@@ -84,7 +84,7 @@ export function AttachProvider({ children }) {
         checkAttachedTab();
       }
     }, 3000);
-    
+
     // Send keepalive messages every 15 seconds to keep service worker alive
     // Combined with chrome.alarms in background.js, this ensures the service worker stays active
     const keepaliveInterval = setInterval(() => {

@@ -427,4 +427,3 @@ Each dashboard is mapped to a specific website tab:
 - Review the codebase and documentation
 
 Thank you for contributing to CacheCat! 🐱
-

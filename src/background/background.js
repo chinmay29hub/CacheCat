@@ -57,7 +57,7 @@ chrome.action.onClicked.addListener(async () => {
             url: activeTab.url,
             timestamp: Date.now(),
           });
-          
+
           ensureKeepaliveAlarm();
 
           targetTabId = activeTab.id;
@@ -90,7 +90,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   const { type, payload } = message;
-  
+
   // Handle keepalive messages (keeps service worker alive)
   if (type === 'KEEPALIVE') {
     // Reset the alarm to keep service worker alive
@@ -397,7 +397,7 @@ async function handleAttachToTab(payload, dashboardTabId) {
       url: tab.url,
       timestamp: Date.now(),
     });
-    
+
     ensureKeepaliveAlarm();
 
     return {

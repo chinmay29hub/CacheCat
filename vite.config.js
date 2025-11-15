@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'fs';
 
 export default defineConfig({
   plugins: [
@@ -63,6 +63,13 @@ export default defineConfig({
         if (existsSync(dashboardSrc)) {
           copyFileSync(dashboardSrc, dashboardDest);
           console.log('Moved dashboard.html to dist root');
+
+          // Clean up the src folder (not needed in dist)
+          const srcDir = resolve(distDir, 'src');
+          if (existsSync(srcDir)) {
+            rmSync(srcDir, { recursive: true, force: true });
+            console.log('Cleaned up src/ folder from dist');
+          }
         }
       },
     },
