@@ -56,9 +56,18 @@ All permissions are necessary for the extension to function:
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability, please open an issue on GitHub:
+If you discover a security vulnerability, please **do not** open a public issue. Instead:
 
-- GitHub: https://github.com/chinmay29hub/CacheCat
+1. **Email the maintainer** or create a private security advisory on GitHub
+2. **Provide details** about the vulnerability:
+   - Description of the issue
+   - Steps to reproduce
+   - Potential impact
+   - Suggested fix (if any)
+
+We take security seriously and will respond promptly to all security reports.
+
+**GitHub Security Advisory**: https://github.com/chinmay29hub/CacheCat/security/advisories/new
 
 ## Overall Security Rating
 

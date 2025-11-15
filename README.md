@@ -22,7 +22,7 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 1. **Clone the repository**:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/chinmay29hub/CacheCat.git
    cd CacheCat
    ```
 
@@ -157,7 +157,7 @@ npm run format
 - `npm run lint` - Check code quality
 - `npm run format` - Format code with Prettier
 
-For detailed development guide, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+For detailed development and contribution guide, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## 📁 Project Structure
 
@@ -207,7 +207,14 @@ See our [Privacy Policy](https://cachecat.vercel.app/privacy-policy.html) for co
 
 ## 🤝 Contributing
 
-Contributions welcome! Please ensure code follows the existing style and includes tests where applicable.
+We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md) for details on:
+
+- Development setup
+- Code style guidelines
+- Pull request process
+- Testing requirements
+
+Contributions of all kinds are welcome - bug fixes, features, documentation, and more!
 
 ## 📄 License
 
