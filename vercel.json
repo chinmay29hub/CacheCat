@@ -3,6 +3,7 @@
   "outputDirectory": "docs",
   "installCommand": null,
   "framework": null,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- docs/",
   "headers": [
     {
       "source": "/(.*)",
