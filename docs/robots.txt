@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /demo/
+
+Sitemap: https://cachecat.vercel.app/sitemap.xml
+
