@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMTFHEM0NQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SMTFHEM0NQ');
+  </script>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -35,6 +45,13 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/icons/icon16.png">
   <link rel="apple-touch-icon" href="/icons/icon128.png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#667eea">
+  
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://github.com">
   
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -73,6 +90,45 @@
       "@type": "AggregateRating",
       "ratingValue": "5",
       "ratingCount": "1"
+    }
+  }
+  </script>
+  
+  <!-- Additional Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CacheCat",
+    "url": "https://cachecat.vercel.app/",
+    "logo": "https://cachecat.vercel.app/icons/icon128.png",
+    "sameAs": [
+      "https://github.com/chinmay29hub/CacheCat"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Technical Support",
+      "url": "https://github.com/chinmay29hub/CacheCat/issues"
+    }
+  }
+  </script>
+  
+  <!-- Additional Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CacheCat",
+    "url": "https://cachecat.vercel.app/",
+    "description": "Professional Chrome Extension for Website Storage Management",
+    "publisher": {
+      "@type": "Organization",
+      "name": "CacheCat"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://github.com/chinmay29hub/CacheCat/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
     }
   }
   </script>

@@ -79,15 +79,24 @@ export function AttachProvider({ children }) {
 
     // Check periodically to verify attachment is still valid
     // Only check if we're attached (to detect if tab was closed)
-    const interval = setInterval(() => {
+    const checkInterval = setInterval(() => {
       if (attachedTabRef.current && !hasExplicitlyDetachedRef.current) {
         checkAttachedTab();
       }
     }, 3000);
+    
+    // Send keepalive messages every 15 seconds to keep service worker alive
+    // Combined with chrome.alarms in background.js, this ensures the service worker stays active
+    const keepaliveInterval = setInterval(() => {
+      chrome.runtime.sendMessage({ type: 'KEEPALIVE' }, () => {
+        // Ignore errors - service worker might be inactive, that's ok
+      });
+    }, 15000);
 
     return () => {
       clearTimeout(checkTimer);
-      clearInterval(interval);
+      clearInterval(checkInterval);
+      clearInterval(keepaliveInterval);
     };
   }, [checkAttachedTab]);
 

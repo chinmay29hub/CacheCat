@@ -4,6 +4,30 @@
 const ACTIVE_TABS = new Map(); // tabId -> { origin, url, timestamp }
 const DASHBOARD_TO_TAB = new Map(); // dashboardTabId -> targetTabId (which website tab this dashboard is viewing)
 
+// Keep service worker alive using chrome.alarms (optimized for Chrome extensions)
+// This is more reliable than fetch-based approaches for extension service workers
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'keepalive') {
+    // Just handling this event keeps the service worker alive
+    // Check if we have active tabs
+    if (ACTIVE_TABS.size > 0) {
+      // Service worker is needed, reset alarm for another 20 seconds
+      chrome.alarms.create('keepalive', { delayInMinutes: 20 / 60 }); // 20 seconds
+    }
+  }
+});
+
+// Create alarm when we have active tabs
+// This ensures the service worker stays alive while there are attached tabs
+function ensureKeepaliveAlarm() {
+  if (ACTIVE_TABS.size > 0) {
+    // Create alarm that fires every 20 seconds (before 30s timeout)
+    chrome.alarms.create('keepalive', { delayInMinutes: 20 / 60, periodInMinutes: 20 / 60 });
+  } else {
+    chrome.alarms.clear('keepalive');
+  }
+}
+
 // Listen for extension icon click
 chrome.action.onClicked.addListener(async () => {
   // Get the active tab (the website user wants to inspect)
@@ -33,6 +57,8 @@ chrome.action.onClicked.addListener(async () => {
             url: activeTab.url,
             timestamp: Date.now(),
           });
+          
+          ensureKeepaliveAlarm();
 
           targetTabId = activeTab.id;
         } catch (error) {
@@ -64,6 +90,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   const { type, payload } = message;
+  
+  // Handle keepalive messages (keeps service worker alive)
+  if (type === 'KEEPALIVE') {
+    // Reset the alarm to keep service worker alive
+    if (ACTIVE_TABS.size > 0) {
+      ensureKeepaliveAlarm();
+    }
+    sendResponse({ success: true });
+    return false; // Synchronous response
+  }
 
   switch (type) {
     case 'ATTACH_TO_TAB':
@@ -85,6 +121,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (!isUsedByOtherDashboard) {
           ACTIVE_TABS.delete(attachedTabId);
         }
+        ensureKeepaliveAlarm();
       }
       sendResponse({ success: true });
       break;
@@ -360,6 +397,8 @@ async function handleAttachToTab(payload, dashboardTabId) {
       url: tab.url,
       timestamp: Date.now(),
     });
+    
+    ensureKeepaliveAlarm();
 
     return {
       success: true,

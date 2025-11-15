@@ -44,6 +44,7 @@ All permissions are necessary for the extension to function:
 - **`cookies`**: Required for cookie management
 - **`scripting`**: Required to inject scripts for storage access
 - **`activeTab`**: Required to attach to websites
+- **`alarms`**: Required to keep service worker active (ensures attachments persist, no data access)
 
 ## Security Best Practices
 

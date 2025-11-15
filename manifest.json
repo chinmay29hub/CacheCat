@@ -8,7 +8,7 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["cookies", "scripting", "activeTab"],
+  "permissions": ["cookies", "scripting", "activeTab", "alarms"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js",
@@ -25,11 +25,12 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "privacy_policy": "https://chinmay29hub.github.io/CacheCat/privacy-policy.html",
   "web_accessible_resources": [
     {
       "resources": ["agent.js", "content.js"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "author": "chinmay29hub",
+  "homepage_url": "https://cachecat.vercel.app"
 }

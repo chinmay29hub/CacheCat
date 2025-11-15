@@ -186,7 +186,7 @@ CacheCat/
 CacheCat requires the following permissions to function:
 
 - **`host_permissions: ["<all_urls>"]`** - Access storage on any website you want to inspect
-- **`permissions: ["cookies", "scripting", "activeTab"]`** - Read/modify cookies, inject scripts, access active tab
+- **`permissions: ["cookies", "scripting", "activeTab", "alarms"]`** - Read/modify cookies, inject scripts, access active tab, schedule background tasks
 
 ### Privacy & Security
 
@@ -203,7 +203,7 @@ CacheCat requires the following permissions to function:
 - All operations are performed locally - nothing leaves your computer
 - Perfect for developers debugging their own applications
 
-See [PRIVACY.md](./PRIVACY.md) for complete privacy details.
+See our [Privacy Policy](https://cachecat.vercel.app/privacy-policy.html) for complete privacy details.
 
 ## 🤝 Contributing
 
