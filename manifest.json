@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CacheCat",
+  "short_name": "CacheCat",
   "version": "1.0.0",
   "description": "View, edit, and manage website storage. Supports Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage.",
   "icons": {
@@ -31,6 +32,8 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "author": "chinmay29hub",
-  "homepage_url": "https://cachecat.vercel.app"
+  "author": "Chinmay Sonawane",
+  "homepage_url": "https://cachecat.vercel.app",
+  "minimum_chrome_version": "88",
+  "incognito": "spanning"
 }

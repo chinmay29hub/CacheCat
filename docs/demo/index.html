@@ -13,7 +13,65 @@
   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CacheCat Demo Site</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>CacheCat Demo Site - Test Website Storage Management</title>
+    <meta name="title" content="CacheCat Demo Site - Test Website Storage Management">
+    <meta name="description" content="Test CacheCat Chrome Extension with sample data. Create Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage entries to test the extension.">
+    <meta name="keywords" content="cachecat demo, storage testing, cookies test, local storage test, indexeddb test, cache storage test, chrome extension demo, storage manager demo">
+    <meta name="author" content="chinmay29hub">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <link rel="canonical" href="https://cachecat.vercel.app/demo/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cachecat.vercel.app/demo/">
+    <meta property="og:title" content="CacheCat Demo Site - Test Website Storage Management">
+    <meta property="og:description" content="Test CacheCat Chrome Extension with sample data. Create Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage entries.">
+    <meta property="og:image" content="https://cachecat.vercel.app/og-image.png">
+    <meta property="og:site_name" content="CacheCat">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://cachecat.vercel.app/demo/">
+    <meta name="twitter:title" content="CacheCat Demo Site - Test Website Storage Management">
+    <meta name="twitter:description" content="Test CacheCat Chrome Extension with sample data. Create Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage entries.">
+    <meta name="twitter:image" content="https://cachecat.vercel.app/og-image.png">
+    <meta name="twitter:creator" content="@chinmay29hub">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../icons/icon16.png">
+    <link rel="apple-touch-icon" href="../icons/icon128.png">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://github.com">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "CacheCat Demo Site",
+      "description": "Test CacheCat Chrome Extension with sample data. Create Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage entries.",
+      "url": "https://cachecat.vercel.app/demo/",
+      "inLanguage": "en-US",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "CacheCat",
+        "url": "https://cachecat.vercel.app/"
+      },
+      "datePublished": "2024-11-01",
+      "dateModified": "2024-11-01"
+    }
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -1008,21 +1066,9 @@
                 document.cookie = 'language=en-US; path=/; max-age=31536000';
                 document.cookie = 'preferences={"notifications":true,"autoSave":false}; path=/; max-age=86400';
                 
-                // Create many more cookies for testing
-                for (let i = 1; i <= 100; i++) {
-                    document.cookie = `cookie_${i}=value_${i}_${Date.now()}; path=/; max-age=86400`;
-                    document.cookie = `pref_${i}=${JSON.stringify({id: i, name: `Item ${i}`, active: i % 2 === 0})}; path=/; max-age=86400`;
-                }
-                
-                // Create cookies with different attributes
-                for (let i = 1; i <= 50; i++) {
-                    document.cookie = `secure_cookie_${i}=secure_value_${i}; path=/; max-age=3600; secure`;
-                    document.cookie = `session_${i}=session_data_${i}; path=/; max-age=7200`;
-                }
-                
                 statusEl.innerHTML = '<span class="status success">✓ Cookies created successfully!</span>';
                 infoEl.style.display = 'block';
-                infoEl.textContent = 'Created 255 cookies:\n- 5 base cookies\n- 200 numbered cookies (cookie_1-100, pref_1-100)\n- 100 session/secure cookies\n\nTotal: 255 cookies';
+                infoEl.textContent = 'Created 5 cookies:\n- user_id\n- session_token\n- theme\n- language\n- preferences';
             } catch (error) {
                 statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
             }
@@ -1047,46 +1093,9 @@
                 localStorage.setItem('lastLogin', new Date().toISOString());
                 localStorage.setItem('favorites', JSON.stringify(['item1', 'item2', 'item3']));
                 
-                // Create many more items for testing
-                for (let i = 1; i <= 500; i++) {
-                    localStorage.setItem(`item_${i}`, `Value for item ${i} - ${Date.now()}`);
-                    localStorage.setItem(`data_${i}`, JSON.stringify({
-                        id: i,
-                        name: `Item ${i}`,
-                        description: `This is item number ${i} with some description text`,
-                        timestamp: new Date().toISOString(),
-                        tags: [`tag${i % 10}`, `category${i % 5}`],
-                        metadata: {
-                            created: Date.now(),
-                            updated: Date.now() + i,
-                            version: i % 10
-                        }
-                    }));
-                }
-                
-                // Create large data items
-                const largeArray = Array.from({ length: 1000 }, (_, i) => ({
-                    id: i,
-                    value: `Large array item ${i}`,
-                    data: `x`.repeat(100) // 100 character string
-                }));
-                localStorage.setItem('large_array', JSON.stringify(largeArray));
-                
-                const largeObject = {};
-                for (let i = 0; i < 500; i++) {
-                    largeObject[`key_${i}`] = {
-                        value: `Value ${i}`,
-                        nested: {
-                            data: `Nested data ${i}`,
-                            items: Array.from({ length: 10 }, (_, j) => `item_${i}_${j}`)
-                        }
-                    };
-                }
-                localStorage.setItem('large_object', JSON.stringify(largeObject));
-                
                 statusEl.innerHTML = '<span class="status success">✓ Local Storage created successfully!</span>';
                 infoEl.style.display = 'block';
-                infoEl.textContent = 'Created 1,007 items:\n- 5 base items\n- 1,000 numbered items (item_1-500, data_1-500)\n- 1 large array (1,000 elements)\n- 1 large object (500 keys)\n\nTotal: 1,007 items';
+                infoEl.textContent = 'Created 5 items:\n- username\n- email\n- settings\n- lastLogin\n- favorites';
             } catch (error) {
                 statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
             }
@@ -1114,28 +1123,9 @@
                     timeSpent: 300
                 }));
                 
-                // Create many more session items
-                for (let i = 1; i <= 300; i++) {
-                    sessionStorage.setItem(`session_item_${i}`, `Session data ${i} - ${Date.now()}`);
-                    sessionStorage.setItem(`page_${i}`, JSON.stringify({
-                        pageId: i,
-                        visited: new Date().toISOString(),
-                        duration: Math.random() * 1000,
-                        interactions: Math.floor(Math.random() * 50)
-                    }));
-                }
-                
-                // Create large session arrays
-                const sessionHistory = Array.from({ length: 200 }, (_, i) => ({
-                    url: `https://example.com/page/${i}`,
-                    timestamp: Date.now() - (200 - i) * 1000,
-                    title: `Page ${i} Title`
-                }));
-                sessionStorage.setItem('session_history', JSON.stringify(sessionHistory));
-                
                 statusEl.innerHTML = '<span class="status success">✓ Session Storage created successfully!</span>';
                 infoEl.style.display = 'block';
-                infoEl.textContent = 'Created 607 items:\n- 5 base items\n- 600 numbered items (session_item_1-300, page_1-300)\n- 1 session history array (200 elements)\n\nTotal: 607 items';
+                infoEl.textContent = 'Created 5 items:\n- sessionId\n- pageViews\n- cart\n- tempData\n- userActivity';
             } catch (error) {
                 statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
             }
@@ -1198,50 +1188,11 @@
                 // Add base products
                 productsStore.put({ id: 1, name: 'Laptop', price: 999.99, category: 'Electronics' });
                 productsStore.put({ id: 2, name: 'Mouse', price: 29.99, category: 'Electronics' });
-                
-                // Add many more products
-                const categories = ['Electronics', 'Books', 'Clothing', 'Food', 'Toys', 'Sports', 'Home', 'Automotive'];
-                for (let i = 3; i <= 2000; i++) {
-                    productsStore.put({
-                        id: i,
-                        name: `Product ${i}`,
-                        price: (Math.random() * 1000).toFixed(2),
-                        category: categories[i % categories.length],
-                        description: `Detailed description for product ${i} with many features and specifications`,
-                        inStock: i % 3 !== 0,
-                        rating: (Math.random() * 5).toFixed(1),
-                        reviews: Array.from({ length: Math.floor(Math.random() * 20) }, (_, j) => ({
-                            id: j,
-                            user: `User${j}`,
-                            rating: Math.floor(Math.random() * 5) + 1,
-                            comment: `Review comment ${j} for product ${i}`
-                        })),
-                        tags: [`tag${i % 10}`, `feature${i % 5}`, `brand${i % 3}`],
-                        metadata: {
-                            created: new Date(Date.now() - i * 3600000).toISOString(),
-                            updated: new Date().toISOString(),
-                            views: i * 100
-                        }
-                    });
-                }
+                productsStore.put({ id: 3, name: 'Keyboard', price: 79.99, category: 'Electronics' });
                 
                 // Add base categories
                 categoriesStore.put({ id: 1, name: 'Electronics', description: 'Electronic devices' });
                 categoriesStore.put({ id: 2, name: 'Books', description: 'Physical and digital books' });
-                
-                // Add more categories
-                for (let i = 3; i <= 100; i++) {
-                    categoriesStore.put({
-                        id: i,
-                        name: `Category ${i}`,
-                        description: `Description for category ${i} with detailed information`,
-                        parentId: i > 10 ? (i % 10) + 1 : null,
-                        metadata: {
-                            productCount: i * 10,
-                            active: i % 5 !== 0
-                        }
-                    });
-                }
                 
                 await waitForTransaction(tx2);
                 db2.close();
@@ -1262,46 +1213,17 @@
                 notesStore.put({ title: 'Meeting Notes', content: 'Discuss project timeline', createdAt: new Date().toISOString() }, 2);
                 notesStore.put({ title: 'Reminder', content: 'Call dentist tomorrow', createdAt: new Date().toISOString() }, 3);
                 
-                // Add many more notes
-                for (let i = 4; i <= 1500; i++) {
-                    notesStore.put({
-                        title: `Note ${i}`,
-                        content: `This is note number ${i} with detailed content. It contains multiple paragraphs and various information. ${'Lorem ipsum dolor sit amet. '.repeat(10)}`,
-                        createdAt: new Date(Date.now() - i * 60000).toISOString(),
-                        updatedAt: new Date().toISOString(),
-                        tags: [`tag${i % 20}`, `category${i % 5}`],
-                        priority: i % 4,
-                        archived: i % 10 === 0,
-                        metadata: {
-                            wordCount: i * 10,
-                            characterCount: i * 50,
-                            attachments: Array.from({ length: i % 5 }, (_, j) => `file${j}.pdf`)
-                        }
-                    }, i);
-                }
-                
                 // Add base tags
                 tagsStore.put({ name: 'Important', color: 'red' }, 'tag1');
                 tagsStore.put({ name: 'Personal', color: 'blue' }, 'tag2');
-                
-                // Add more tags
-                const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'gray'];
-                for (let i = 3; i <= 200; i++) {
-                    tagsStore.put({
-                        name: `Tag ${i}`,
-                        color: colors[i % colors.length],
-                        description: `Description for tag ${i}`,
-                        usageCount: i * 5,
-                        created: new Date(Date.now() - i * 86400000).toISOString()
-                    }, `tag${i}`);
-                }
+                tagsStore.put({ name: 'Work', color: 'green' }, 'tag3');
                 
                 await waitForTransaction(tx3);
                 db3.close();
                 
                 statusEl.innerHTML = '<span class="status success">✓ IndexedDB created successfully!</span>';
                 infoEl.style.display = 'block';
-                infoEl.textContent = 'Created 3 databases:\n1. UsersDB (inline keys)\n   - users store: 1,000 records\n2. ProductsDB (inline keys)\n   - products store: 2,000 records\n   - categories store: 100 records\n3. NotesDB (out-of-line keys)\n   - notes store: 1,500 records\n   - tags store: 200 records\n\nTotal: 4,800 records';
+                infoEl.textContent = 'Created 3 databases:\n1. UsersDB (inline keys)\n   - users store: 3 records\n2. ProductsDB (inline keys)\n   - products store: 3 records\n   - categories store: 2 records\n3. NotesDB (out-of-line keys)\n   - notes store: 3 records\n   - tags store: 3 records\n\nTotal: 14 records';
             } catch (error) {
                 statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
             }
@@ -1353,52 +1275,15 @@
                 await cache1.put('/api/users', new Response(JSON.stringify([{ id: 1, name: 'User 1' }]), {
                     headers: { 'Content-Type': 'application/json' }
                 }));
-                
-                // Add many more API cache entries
-                for (let i = 1; i <= 500; i++) {
-                    await cache1.put(`/api/items/${i}`, new Response(JSON.stringify({
-                        id: i,
-                        name: `Item ${i}`,
-                        data: `Data for item ${i}`,
-                        timestamp: new Date().toISOString(),
-                        metadata: {
-                            version: i % 10,
-                            tags: [`tag${i % 20}`, `category${i % 5}`]
-                        }
-                    }), {
-                        headers: { 'Content-Type': 'application/json' }
-                    }));
-                }
-                
-                // Add paginated API endpoints
-                for (let page = 1; page <= 100; page++) {
-                    const items = Array.from({ length: 20 }, (_, i) => ({
-                        id: (page - 1) * 20 + i + 1,
-                        name: `Item ${(page - 1) * 20 + i + 1}`,
-                        page: page
-                    }));
-                    await cache1.put(`/api/items?page=${page}`, new Response(JSON.stringify({
-                        page,
-                        totalPages: 100,
-                        items
-                    }), {
-                        headers: { 'Content-Type': 'application/json' }
-                    }));
-                }
+                await cache1.put('/api/products', new Response(JSON.stringify([{ id: 1, name: 'Product 1' }]), {
+                    headers: { 'Content-Type': 'application/json' }
+                }));
                 
                 // Cache 2: Images Cache
                 const cache2 = await caches.open('images-cache-v1');
                 const imageBlob = new Blob(['fake image data'], { type: 'image/png' });
                 await cache2.put('/images/logo.png', new Response(imageBlob));
                 await cache2.put('/images/banner.jpg', new Response(imageBlob));
-                
-                // Add many more image cache entries
-                for (let i = 1; i <= 300; i++) {
-                    const imageData = `Fake image data for image ${i} - ${'x'.repeat(100)}`;
-                    const blob = new Blob([imageData], { type: i % 2 === 0 ? 'image/png' : 'image/jpeg' });
-                    await cache2.put(`/images/photo_${i}.${i % 2 === 0 ? 'png' : 'jpg'}`, new Response(blob));
-                    await cache2.put(`/images/thumbnails/thumb_${i}.jpg`, new Response(blob));
-                }
                 
                 // Cache 3: Static Assets - Cache actual files that can be refetched
                 const cache3 = await caches.open('static-assets-v1');
@@ -1462,7 +1347,7 @@
                 
                 statusEl.innerHTML = '<span class="status success">✓ Cache Storage created successfully!</span>';
                 infoEl.style.display = 'block';
-                infoEl.textContent = 'Created 3 caches:\n1. app-cache-v1: 602 entries (2 base + 500 items + 100 pages)\n2. images-cache-v1: 602 entries (2 base + 600 images)\n3. static-assets-v1: 2 entries\n\nTotal: 1,206 cache entries\n\n💡 To test refetch:\n- Serve this demo via HTTP (python3 -m http.server)\n- Open CacheCat dashboard\n- Click 🔄 refetch on styles.css\n- Modify styles.css file\n- Refetch again to see updated content';
+                infoEl.textContent = 'Created 3 caches:\n1. app-cache-v1: 3 entries\n2. images-cache-v1: 2 entries\n3. static-assets-v1: 2 entries\n\nTotal: 7 cache entries\n\n💡 To test refetch:\n- Serve this demo via HTTP (python3 -m http.server)\n- Open CacheCat dashboard\n- Click 🔄 refetch on styles.css\n- Modify styles.css file\n- Refetch again to see updated content';
             } catch (error) {
                 statusEl.innerHTML = '<span class="status error">✗ Error: ' + error.message + '</span>';
             }
