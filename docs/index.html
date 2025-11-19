@@ -43,8 +43,13 @@
   <meta name="twitter:creator" content="@chinmay29hub">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/icons/icon16.png">
-  <link rel="apple-touch-icon" href="/icons/icon128.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon48.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/icons/icon128.png">
+  <link rel="shortcut icon" type="image/png" href="/icons/icon48.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon128.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon128.png">
   
   <!-- Theme Color -->
   <meta name="theme-color" content="#667eea">
@@ -68,6 +73,8 @@
     },
     "description": "A powerful Chrome Extension that provides a full-featured dashboard to view, edit, and manage website storage (Cookies, Local Storage, Session Storage, IndexedDB, Cache Storage).",
     "url": "https://cachecat.vercel.app/",
+    "downloadUrl": "https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd",
+    "softwareHelp": "https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd",
     "author": {
       "@type": "Person",
       "name": "chinmay29hub",
@@ -487,6 +494,20 @@
     .btn-outline:hover {
       background: var(--primary);
       color: white;
+    }
+    
+    /* Hero section button overrides */
+    .hero .btn-outline {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+      box-shadow: none;
+    }
+    
+    .hero .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-color: white;
     }
     
     /* Container */
@@ -1501,8 +1522,9 @@
         Perfect for developers, QA testers, and power users.
       </p>
       <div class="cta-buttons">
-        <a href="https://github.com/chinmay29hub/CacheCat" class="btn" target="_blank" rel="noopener noreferrer">Get Started</a>
+        <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" class="btn" target="_blank" rel="noopener noreferrer">Add to Chrome</a>
         <a href="demo/" class="btn btn-secondary">Try Demo</a>
+        <a href="https://github.com/chinmay29hub/CacheCat" class="btn btn-outline" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>
   </section>
@@ -1563,7 +1585,7 @@
         <div class="step">
           <div class="step-number">1</div>
           <h3>Install Extension</h3>
-          <p>Download from GitHub or Chrome Web Store and install the extension</p>
+          <p>Install from <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" target="_blank" rel="noopener noreferrer">Chrome Web Store</a> or <a href="https://github.com/chinmay29hub/CacheCat" target="_blank" rel="noopener noreferrer">GitHub</a></p>
         </div>
         
         <div class="step">
@@ -1684,29 +1706,30 @@
       
       <div class="install-steps">
         <div class="install-step">
-          <h4>1. Download the Extension</h4>
-          <p>Clone the repository from <a href="https://github.com/chinmay29hub/CacheCat" target="_blank" rel="noopener noreferrer">GitHub</a> or download the latest release.</p>
+          <h4>1. Install from Chrome Web Store (Recommended)</h4>
+          <p>Visit the <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>, click "Add to Chrome", and you're ready to go!</p>
         </div>
         
         <div class="install-step">
-          <h4>2. Build the Extension</h4>
-          <p>Run <code>npm install</code> to install dependencies, then <code>npm run build</code> to build the extension.</p>
+          <h4>2. Or Install Manually (For Development)</h4>
+          <p>Clone from <a href="https://github.com/chinmay29hub/CacheCat" target="_blank" rel="noopener noreferrer">GitHub</a>, run <code>npm install</code> and <code>npm run build</code>, then load the <code>dist/</code> folder in Chrome.</p>
         </div>
         
         <div class="install-step">
-          <h4>3. Load in Chrome</h4>
-          <p>Open <code>chrome://extensions/</code>, enable "Developer mode", click "Load unpacked", and select the <code>dist/</code> directory.</p>
+          <h4>3. Navigate to a Website</h4>
+          <p>Visit any website you want to inspect or manage storage for.</p>
         </div>
         
         <div class="install-step">
-          <h4>4. Start Using</h4>
-          <p>Navigate to any website and click the CacheCat icon to open the dashboard!</p>
+          <h4>4. Open Dashboard</h4>
+          <p>Click the CacheCat icon in your browser toolbar to open the dashboard and start managing storage!</p>
         </div>
       </div>
       
       <div class="install-cta">
-        <a href="https://github.com/chinmay29hub/CacheCat" class="btn" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+        <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" class="btn" target="_blank" rel="noopener noreferrer">Install from Chrome Web Store</a>
         <a href="demo/" class="btn btn-outline">Try Demo Site</a>
+        <a href="https://github.com/chinmay29hub/CacheCat" class="btn btn-outline" target="_blank" rel="noopener noreferrer">View on GitHub</a>
       </div>
     </div>
   </section>
@@ -1720,6 +1743,7 @@
       </div>
       <nav aria-label="Footer navigation">
         <div class="footer-links">
+          <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
           <a href="https://github.com/chinmay29hub/CacheCat" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href="privacy-policy.html">Privacy Policy</a>
           <a href="demo/">Demo</a>

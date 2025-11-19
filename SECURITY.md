@@ -73,4 +73,4 @@ We take security seriously and will respond promptly to all security reports.
 
 **Status**: **Excellent** ✅
 
-The extension follows security best practices and is ready for Chrome Web Store submission.
+The extension follows security best practices and is [published on the Chrome Web Store](https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd).

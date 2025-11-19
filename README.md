@@ -1,9 +1,11 @@
 # CacheCat 🐱
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=google-chrome&logoColor=white)](https://chrome.google.com/webstore)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-CacheCat-4285F4?logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+
+[![Available in the Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png)](https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd)
 
 A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to view, edit, and manage website storage. Perfect for developers, QA testers, and power users.
 
@@ -18,6 +20,15 @@ A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to 
 ## 🚀 Quick Start
 
 ### Installation
+
+**Option 1: Install from Chrome Web Store (Recommended)**
+
+1. Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd)
+2. Click "Add to Chrome"
+3. Confirm installation
+4. Done! The extension is ready to use.
+
+**Option 2: Manual Installation (For Development)**
 
 1. **Clone the repository**:
 

@@ -43,8 +43,13 @@
     <meta name="twitter:creator" content="@chinmay29hub">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../icons/icon16.png">
-    <link rel="apple-touch-icon" href="../icons/icon128.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../icons/icon16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="../icons/icon48.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="../icons/icon128.png">
+    <link rel="shortcut icon" type="image/png" href="../icons/icon48.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="../icons/icon128.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../icons/icon128.png">
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#667eea">
@@ -942,12 +947,19 @@
                     <div class="step">
                         <div class="step-number">1</div>
                         <div class="step-content">
+                            <strong>Install CacheCat Extension</strong>
+                            <p>First, install the CacheCat extension from the <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: underline;">Chrome Web Store</a> if you haven't already. This is required to view and manage the storage data.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
                             <strong>Create Dummy Data</strong>
                             <p>Click the buttons below to create sample storage data (Cookies, Local Storage, Session Storage, IndexedDB, and Cache Storage).</p>
                         </div>
                     </div>
                     <div class="step">
-                        <div class="step-number">2</div>
+                        <div class="step-number">3</div>
                         <div class="step-content">
                             <strong>Open CacheCat Extension</strong>
                             <p>After creating the data, click the CacheCat extension icon in your browser toolbar to open the dashboard and view all the storage data.</p>
@@ -1024,6 +1036,7 @@
       </div>
       <nav aria-label="Footer navigation">
         <div class="footer-links">
+          <a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
           <a href="https://github.com/chinmay29hub/CacheCat" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href="/privacy-policy.html">Privacy Policy</a>
           <a href="/demo/">Demo</a>
@@ -1276,8 +1289,8 @@
                     headers: { 'Content-Type': 'application/json' }
                 }));
                 await cache1.put('/api/products', new Response(JSON.stringify([{ id: 1, name: 'Product 1' }]), {
-                    headers: { 'Content-Type': 'application/json' }
-                }));
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
                 
                 // Cache 2: Images Cache
                 const cache2 = await caches.open('images-cache-v1');

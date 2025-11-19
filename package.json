@@ -41,7 +41,8 @@
   "bugs": {
     "url": "https://github.com/chinmay29hub/CacheCat/issues"
   },
-  "homepage": "https://github.com/chinmay29hub/CacheCat#readme",
+  "homepage": "https://cachecat.vercel.app",
+  "chromeWebStore": "https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd",
   "devDependencies": {
     "@types/chrome": "^0.0.268",
     "@vitejs/plugin-react": "^4.3.1",
