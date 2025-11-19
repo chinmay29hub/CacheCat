@@ -5,9 +5,7 @@
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 
-<a href="https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd" target="_blank" rel="noopener noreferrer">
-  <img src="https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png" alt="Available in the Chrome Web Store" />
-</a>
+[![Available in the Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png)](https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd)
 
 A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to view, edit, and manage website storage. Perfect for developers, QA testers, and power users.
 
