@@ -7,6 +7,8 @@
 
 [![Available in the Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png)](https://chromewebstore.google.com/detail/cachecat/kkfchdmglcngekkddkeljllfgdpbodgd)
 
+<a href="https://www.producthunt.com/products/cachecat?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-cachecat" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1040153&theme=light&t=1763615107572" alt="CacheCat - Unified&#0032;dashboard&#0032;for&#0032;all&#0032;website&#0032;storage&#0032;management | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 A powerful Chrome Extension (Manifest V3) that provides a full-tab dashboard to view, edit, and manage website storage. Perfect for developers, QA testers, and power users.
 
 ## ✨ Features
