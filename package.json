@@ -1,6 +1,6 @@
 {
   "name": "cachecat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CacheCat - Full-featured Chrome Extension to view, edit, and manage website storage (Cookies, Local Storage, Session Storage, IndexedDB, Cache Storage). Modern dashboard interface with light/dark themes.",
   "type": "module",
   "main": "dist/background.js",

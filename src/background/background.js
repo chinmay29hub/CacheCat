@@ -193,8 +193,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       if (targetTabIdForCookies && ACTIVE_TABS.has(targetTabIdForCookies)) {
-        const tabInfo = ACTIVE_TABS.get(targetTabIdForCookies);
-        handleGetCookies(tabInfo.origin)
+        handleGetCookies(targetTabIdForCookies)
           .then(sendResponse)
           .catch((error) => sendResponse({ error: error.message }));
         return true;
@@ -412,14 +411,230 @@ async function handleAttachToTab(payload, dashboardTabId) {
   }
 }
 
+// Helper function to get performance entries (injected into page)
+function getPerformanceEntries() {
+  return performance
+    .getEntriesByType('resource')
+    .map((r) => r.name);
+}
+
 // Cookies API handlers
-async function handleGetCookies(url) {
-  if (!url) {
-    throw new Error('URL required');
+// Source: https://stackoverflow.com/a/76801557
+// Uses performance API to detect all resource origins, then fetches cookies for each
+async function handleGetCookies(tabId) {
+  if (!tabId) {
+    throw new Error('Tab ID required');
   }
+
   try {
-    const cookies = await chrome.cookies.getAll({ url });
-    return { cookies: cookies.map(formatCookie) };
+    // Step 1: Get all resource URLs from the page using performance API
+    const results = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: getPerformanceEntries,
+    });
+
+    const resourceUrls = results[0]?.result || [];
+    
+    // Step 2: Extract unique origins from resource URLs
+    const origins = resourceUrls
+      .map((url) => {
+        try {
+          return new URL(url).origin;
+        } catch {
+          return null;
+        }
+      })
+      .filter((origin) => Boolean(origin) && origin !== 'null');
+
+    // Also include the main page origin
+    let mainOrigin = null;
+    try {
+      const tab = await chrome.tabs.get(tabId);
+      if (tab?.url) {
+        mainOrigin = new URL(tab.url).origin;
+        origins.push(mainOrigin);
+      }
+    } catch (e) {
+      // Ignore if we can't get tab info
+    }
+
+    const uniqueOrigins = new Set(origins);
+
+    // Step 3: Get the main tab URL to also query directly
+    let mainTabUrl = null;
+    try {
+      const tab = await chrome.tabs.get(tabId);
+      if (tab?.url) {
+        mainTabUrl = tab.url;
+      }
+    } catch (e) {
+      // Ignore if we can't get tab URL
+    }
+
+    // Step 4: Get cookies for each origin AND the main tab URL
+    // chrome.cookies.getAll({ url }) returns cookies that would be sent with requests
+    // to that URL, which matches DevTools behavior
+    // Note: Partitioned cookies might need special handling
+    const getCookiesPromises = [];
+    
+    // First, get cookies for the main tab URL directly (this is what DevTools shows)
+    if (mainTabUrl) {
+      const mainPromise = chrome.cookies
+        .getAll({ url: mainTabUrl })
+        .then(async (cookies) => {
+          // Check for cf_clearance cookie specifically (partitioned cookies need special handling)
+          let cfClearance = cookies.find(c => c.name === 'cf_clearance');
+          if (!cfClearance) {
+            // Try to get cf_clearance with partition key (for partitioned cookies)
+            // IMPORTANT: Do NOT include 'url' parameter when querying partitioned cookies
+            try {
+              const mainUrlObj = new URL(mainTabUrl);
+              const hostname = mainUrlObj.hostname;
+              
+              // Extract top-level domain for partition key
+              const domainParts = hostname.split('.');
+              let topLevelDomain = hostname;
+              if (domainParts.length >= 2) {
+                topLevelDomain = domainParts.slice(-2).join('.');
+              }
+              const partitionKeyUrl = `https://${topLevelDomain}`;
+              
+              // Try different domain formats (with and without leading dot, and parent domains)
+              const domainVariants = [
+                `.${hostname}`,
+                hostname,
+                `.${domainParts.slice(1).join('.')}`,
+                domainParts.slice(1).join('.'),
+                `.${topLevelDomain}`,
+                topLevelDomain
+              ];
+              
+              // Try querying with partition key for each domain variant
+              let found = false;
+              for (const domainVariant of domainVariants) {
+                try {
+                  const partitionedCookies = await chrome.cookies.getAll({
+                    name: 'cf_clearance',
+                    domain: domainVariant,
+                    partitionKey: { topLevelSite: partitionKeyUrl }
+                  });
+                  if (partitionedCookies.length > 0) {
+                    cfClearance = partitionedCookies[0];
+                    cookies.push(cfClearance);
+                    found = true;
+                    break;
+                  }
+                } catch (e) {
+                  continue;
+                }
+              }
+              
+              // If partitionKey approach didn't work, try getAll and filter
+              if (!found) {
+                try {
+                  const allCookies = await chrome.cookies.getAll({});
+                  const cfClearanceAll = allCookies.find(c => {
+                    if (c.name !== 'cf_clearance') return false;
+                    return domainVariants.some(variant => 
+                      c.domain === variant || 
+                      c.domain === variant.replace(/^\./, '') ||
+                      variant.includes(c.domain.replace(/^\./, ''))
+                    );
+                  });
+                  if (cfClearanceAll) {
+                    cookies.push(cfClearanceAll);
+                  }
+                } catch (e) {
+                  // Silently fail
+                }
+              }
+            } catch (e) {
+              // Silently fail
+            }
+          }
+          return {
+            url: mainTabUrl,
+            cookies,
+            isMainTab: true,
+          };
+        })
+        .catch(() => {
+          return { url: mainTabUrl, cookies: [], isMainTab: true };
+        });
+      getCookiesPromises.push(mainPromise);
+    }
+    
+    // Also get cookies for each origin (to catch third-party cookies)
+    // For origins, we'll try both the origin URL and construct a full URL
+    for (const originUrl of uniqueOrigins) {
+      // Try with origin URL first
+      const originPromise = chrome.cookies
+        .getAll({ url: originUrl })
+        .then((cookies) => {
+          return {
+            url: originUrl,
+            cookies,
+            isMainTab: false,
+          };
+        })
+        .catch(() => {
+          return { url: originUrl, cookies: [], isMainTab: false };
+        });
+      getCookiesPromises.push(originPromise);
+      
+      // Also try with a constructed full URL for partitioned cookies
+      // Partitioned cookies might need the full URL path, not just origin
+      if (mainTabUrl && originUrl !== mainOrigin) {
+        try {
+          const originObj = new URL(originUrl);
+          const mainUrlObj = new URL(mainTabUrl);
+          // Construct a URL using the origin's protocol and host, with main tab's path
+          const fullOriginUrl = `${originObj.protocol}//${originObj.host}${mainUrlObj.pathname}`;
+          
+          const fullUrlPromise = chrome.cookies
+            .getAll({ url: fullOriginUrl })
+            .then((cookies) => {
+              return {
+                url: fullOriginUrl,
+                cookies,
+                isMainTab: false,
+              };
+            })
+            .catch(() => {
+              // Silently fail for full URL attempts
+              return { url: fullOriginUrl, cookies: [], isMainTab: false };
+            });
+          getCookiesPromises.push(fullUrlPromise);
+        } catch (e) {
+          // Ignore URL construction errors
+        }
+      }
+    }
+
+    const urlCookies = await Promise.all(getCookiesPromises);
+
+    // Step 5: Combine all cookies from all sources
+    // We query both the main tab URL and all origins to ensure we catch all cookies
+    // DevTools shows cookies that would be sent with requests to the page, which includes
+    // first-party cookies and third-party cookies from domains that have resources on the page
+    const cookieMap = new Map();
+    
+    // Process all cookie sources (main tab URL + all origins)
+    // This ensures we get all cookies, including third-party ones
+    for (const { cookies } of urlCookies) {
+      for (const cookie of cookies) {
+        const key = `${cookie.name}|${cookie.domain}|${cookie.path}`;
+        if (!cookieMap.has(key)) {
+          cookieMap.set(key, cookie);
+        }
+      }
+    }
+    
+
+    const allCookies = Array.from(cookieMap.values());
+    const formattedCookies = allCookies.map(formatCookie);
+    
+    return { cookies: formattedCookies };
   } catch (error) {
     throw new Error(`Failed to get cookies: ${error.message}`);
   }
